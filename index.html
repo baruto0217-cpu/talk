@@ -657,6 +657,13 @@
 
     <!-- Step2: 名前選択 -->
     <div class="login-step hidden" id="step2">
+      <div id="admin-direct-wrap" class="hidden">
+        <div style="font-size:12px;color:var(--text2);background:var(--amber-bg);border:0.5px solid #fac775;border-radius:var(--radius-sm);padding:10px 12px;line-height:1.6;">
+          管理者合言葉で認証されました。<br>名前を選ばずに管理者画面へ入ることもできます。
+        </div>
+        <button class="btn-primary" style="background:var(--amber);" onclick="enterAdminDirect()">管理者画面へ入る</button>
+        <div style="font-size:11px;color:var(--text3);text-align:center;">または下から名前を選んでチャットに参加</div>
+      </div>
       <div>
         <div class="field-label">あなたの名前を選択</div>
         <div class="name-grid" id="name-grid">
@@ -879,6 +886,10 @@ async function submitPassphrase() {
     grid.appendChild(btn);
   });
 
+  if (isAdmin) {
+    document.getElementById('admin-direct-wrap').classList.remove('hidden');
+  }
+
   document.getElementById('step1').classList.add('hidden');
   document.getElementById('step2').classList.remove('hidden');
 }
@@ -902,6 +913,18 @@ async function enterChat() {
   await startChat();
 }
 
+async function enterAdminDirect() {
+  currentUser = {
+    id:           'admin',
+    display_name: '管理者',
+    role:         '管理者',
+    is_admin:     true
+  };
+  localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
+  showScreen('admin');
+  await loadAdminMembers();
+}
+
 async function startChat() {
   showScreen('chat');
   document.getElementById('sidebar-username').textContent =
@@ -921,6 +944,7 @@ function logout() {
   document.getElementById('step2').classList.add('hidden');
   document.getElementById('name-grid').innerHTML = '';
   document.getElementById('enter-btn').disabled = true;
+  document.getElementById('admin-direct-wrap').classList.add('hidden');
   showScreen('login');
 }
 
