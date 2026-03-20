@@ -285,50 +285,24 @@ textarea,input{-webkit-appearance:none;appearance:none}
 <!-- 管理者画面 -->
 <div id="screen-admin" class="screen">
   <div class="admin-topbar">
-    <div class="admin-topbar-title">管理者画面</div>
+    <div class="admin-topbar-title">管理者メニュー</div>
     <span class="admin-badge">管理者</span>
     <button class="admin-back" onclick="goChat()">← 戻る</button>
   </div>
   <div class="admin-scroll">
-    <div class="admin-panel">
-      <div class="admin-panel-header">登録隊員一覧</div>
-      <table class="member-table">
-        <thead><tr><th>氏名</th><th>役職</th><th></th></tr></thead>
-        <tbody id="admin-member-tbody"></tbody>
-      </table>
-    </div>
     <div class="admin-card">
-      <div class="admin-card-title">隊員を追加</div>
-      <div class="admin-field">
-        <label>氏名</label>
-        <input class="field-input" type="text" id="new-member-name" placeholder="例：伊藤 健">
-      </div>
-      <div class="admin-field">
-        <label>役職</label>
-        <select id="new-member-role">
-          <option>隊長</option><option>救命士</option><option selected>隊員</option>
-        </select>
-      </div>
-      <button class="admin-add-btn" onclick="addMember()">追加する</button>
-      <div class="success-msg" id="member-success">追加しました</div>
+      <div class="admin-card-title">隊員の追加・削除</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;">Supabase ダッシュボードの <strong>Table Editor → members</strong> テーブルから直接追加・削除してください。</p>
+      <a href="https://supabase.com/dashboard" target="_blank" style="display:block;padding:11px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);text-align:center;text-decoration:none;">Supabase ダッシュボードを開く</a>
     </div>
     <div class="admin-card">
       <div class="admin-card-title">合言葉の変更</div>
-      <div class="admin-field">
-        <label>一般合言葉</label>
-        <div class="pw-row">
-          <input class="field-input" type="text" id="pw-general" placeholder="新しい合言葉" autocomplete="off">
-          <button class="pw-update-btn" onclick="updatePassphrase('passphrase_general','pw-general')">更新</button>
-        </div>
-      </div>
-      <div class="admin-field">
-        <label>管理者合言葉</label>
-        <div class="pw-row">
-          <input class="field-input" type="text" id="pw-admin" placeholder="新しい合言葉" autocomplete="off">
-          <button class="pw-update-btn" onclick="updatePassphrase('passphrase_admin','pw-admin')">更新</button>
-        </div>
-      </div>
-      <div class="success-msg" id="pw-success">更新しました</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;">Supabase ダッシュボードの <strong>Table Editor → settings</strong> テーブルから <code style="font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:3px;">passphrase_general</code> と <code style="font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:3px;">passphrase_admin</code> の value を直接編集してください。</p>
+      <a href="https://supabase.com/dashboard" target="_blank" style="display:block;padding:11px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);text-align:center;text-decoration:none;">Supabase ダッシュボードを開く</a>
+    </div>
+    <div class="admin-card" style="border-color:#f09595;">
+      <div class="admin-card-title" style="color:var(--red);">セキュリティについて</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;">このアプリは anon key のみ使用しており、RLS（Row Level Security）で保護されています。GitHub リポジトリは <strong>必ずプライベート</strong> に設定してください。</p>
     </div>
   </div>
 </div>
@@ -367,7 +341,7 @@ const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
 
 /* ================================================
-   初期化
+   初期化（anon key のみ使用 / RLS有効）
 ================================================ */
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -785,49 +759,12 @@ function subscribeRealtime() {
 /* ================================================
    管理者画面
 ================================================ */
-async function goAdmin() { showScreen('admin'); await loadAdminMembers(); }
+function goAdmin() { showScreen('admin'); }
 function goChat() { showScreen('chat'); }
 
-async function loadAdminMembers() {
-  const { data } = await db.from('members').select('*').order('role').order('display_name');
-  const tbody = document.getElementById('admin-member-tbody');
-  tbody.innerHTML = '';
-  (data || []).forEach(m => {
-    const tr = document.createElement('tr');
-    const pillCls = { '隊長':'role-leader', '救命士':'role-qs' }[m.role] || 'role-member';
-    tr.innerHTML = `
-      <td>${esc(m.display_name)}</td>
-      <td><span class="role-pill ${pillCls}">${esc(m.role)}</span></td>
-      <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
 
-async function addMember() {
-  const name = document.getElementById('new-member-name').value.trim();
-  const role = document.getElementById('new-member-role').value;
-  if (!name) return;
-  const { error } = await db.from('members').insert({ display_name: name, role });
-  if (!error) {
-    document.getElementById('new-member-name').value = '';
-    showSuccess('member-success');
-    await loadAdminMembers();
-  }
-}
 
-async function deleteMember(id, name) {
-  if (!confirm(`「${name}」を削除しますか？`)) return;
-  await db.from('members').delete().eq('id', id);
-  await loadAdminMembers();
-}
 
-async function updatePassphrase(key, inputId) {
-  const val = document.getElementById(inputId).value.trim();
-  if (!val) return;
-  await db.from('settings').upsert({ key, value: val });
-  document.getElementById(inputId).value = '';
-  showSuccess('pw-success');
-}
 
 /* ================================================
    ユーティリティ
