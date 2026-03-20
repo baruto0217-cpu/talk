@@ -136,7 +136,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .tag-sel-btn.sel-good{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);font-weight:600}
 .tag-sel-btn.sel-imp{background:var(--coral-bg);border-color:var(--coral-bd);color:var(--coral);font-weight:600}
 .tag-sel-btn.sel-q{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);font-weight:600}
-.anon-label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.anon-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500}
+.anon-label input[type=checkbox]{width:20px;height:20px;cursor:pointer;accent-color:var(--teal);flex-shrink:0}
 .input-row{display:flex;gap:8px;align-items:flex-end}
 .msg-ta{flex:1;resize:none;height:54px;font-size:15px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
 .msg-ta:focus{outline:none;border-color:var(--teal)}
@@ -266,13 +267,15 @@ textarea,input{-webkit-appearance:none;appearance:none}
       <div class="no-case">☰ メニューから症例を選択してください</div>
     </div>
     <div class="input-area" id="input-area" style="display:none;">
-      <div class="input-controls">
-        <span class="ctrl-label">タグ：</span>
-        <button class="tag-sel-btn" data-tag="良かった点" onclick="selectTag(this)">良かった点</button>
-        <button class="tag-sel-btn" data-tag="改善点" onclick="selectTag(this)">改善点</button>
-        <button class="tag-sel-btn" data-tag="質問" onclick="selectTag(this)">質問</button>
-        <button class="tag-sel-btn" data-tag="なし" onclick="selectTag(this)">なし</button>
-        <label class="anon-label"><input type="checkbox" id="anon-check"> 匿名</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="input-controls" style="flex:1;">
+          <span class="ctrl-label">タグ：</span>
+          <button class="tag-sel-btn" data-tag="良かった点" onclick="selectTag(this)">良かった点</button>
+          <button class="tag-sel-btn" data-tag="改善点" onclick="selectTag(this)">改善点</button>
+          <button class="tag-sel-btn" data-tag="質問" onclick="selectTag(this)">質問</button>
+          <button class="tag-sel-btn" data-tag="なし" onclick="selectTag(this)">なし</button>
+        </div>
+        <label class="anon-label" style="margin-left:0;flex-shrink:0;"><input type="checkbox" id="anon-check"> 匿名</label>
       </div>
       <div class="input-row">
         <textarea class="msg-ta" id="msg-input" placeholder="振り返りを入力..."></textarea>
@@ -290,19 +293,32 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <button class="admin-back" onclick="goChat()">← 戻る</button>
   </div>
   <div class="admin-scroll">
-    <div class="admin-card">
-      <div class="admin-card-title">隊員の追加・削除</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;">Supabase ダッシュボードの <strong>Table Editor → members</strong> テーブルから直接追加・削除してください。</p>
-      <a href="https://supabase.com/dashboard" target="_blank" style="display:block;padding:11px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);text-align:center;text-decoration:none;">Supabase ダッシュボードを開く</a>
+    <div class="admin-panel">
+      <div class="admin-panel-header">登録隊員一覧</div>
+      <table class="member-table">
+        <thead><tr><th>氏名</th><th>役職</th><th></th></tr></thead>
+        <tbody id="admin-member-tbody"></tbody>
+      </table>
     </div>
     <div class="admin-card">
-      <div class="admin-card-title">合言葉の変更</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;">Supabase ダッシュボードの <strong>Table Editor → settings</strong> テーブルから <code style="font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:3px;">passphrase_general</code> と <code style="font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:3px;">passphrase_admin</code> の value を直接編集してください。</p>
-      <a href="https://supabase.com/dashboard" target="_blank" style="display:block;padding:11px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);text-align:center;text-decoration:none;">Supabase ダッシュボードを開く</a>
+      <div class="admin-card-title">隊員を追加</div>
+      <div class="admin-field">
+        <label>氏名</label>
+        <input class="field-input" type="text" id="new-member-name" placeholder="例：伊藤 健">
+      </div>
+      <div class="admin-field">
+        <label>役職</label>
+        <select id="new-member-role">
+          <option>隊長</option><option>救命士</option><option selected>隊員</option>
+        </select>
+      </div>
+      <button class="admin-add-btn" onclick="addMember()">追加する</button>
+      <div class="success-msg" id="member-success">追加しました</div>
+      <div class="error-msg" id="member-error" style="display:none;">追加に失敗しました。RLSの設定を確認してください。</div>
     </div>
     <div class="admin-card" style="border-color:#f09595;">
       <div class="admin-card-title" style="color:var(--red);">セキュリティについて</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;">このアプリは anon key のみ使用しており、RLS（Row Level Security）で保護されています。GitHub リポジトリは <strong>必ずプライベート</strong> に設定してください。</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;">このアプリは anon key のみ使用しています。管理者操作（隊員追加・削除）を有効にするには Supabase の RLS ポリシーで members テーブルへの書き込みを許可してください。合言葉の変更は <strong>Table Editor → settings</strong> から行えます。</p>
     </div>
   </div>
 </div>
@@ -759,8 +775,49 @@ function subscribeRealtime() {
 /* ================================================
    管理者画面
 ================================================ */
-function goAdmin() { showScreen('admin'); }
+async function goAdmin() { showScreen('admin'); await loadAdminMembers(); }
 function goChat() { showScreen('chat'); }
+
+async function loadAdminMembers() {
+  const { data } = await db.from('members').select('*').order('role').order('display_name');
+  const tbody = document.getElementById('admin-member-tbody');
+  tbody.innerHTML = '';
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="font-size:12px;color:var(--text3);padding:12px 14px;">隊員が登録されていません</td></tr>';
+    return;
+  }
+  data.forEach(m => {
+    const tr = document.createElement('tr');
+    const pillCls = { '隊長':'role-leader', '救命士':'role-qs' }[m.role] || 'role-member';
+    tr.innerHTML = `
+      <td>${esc(m.display_name)}</td>
+      <td><span class="role-pill ${pillCls}">${esc(m.role)}</span></td>
+      <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function addMember() {
+  const name = document.getElementById('new-member-name').value.trim();
+  const role = document.getElementById('new-member-role').value;
+  if (!name) return;
+  const { error } = await db.from('members').insert({ display_name: name, role });
+  if (!error) {
+    document.getElementById('new-member-name').value = '';
+    showSuccess('member-success');
+    await loadAdminMembers();
+  } else {
+    document.getElementById('member-error').style.display = 'block';
+    setTimeout(() => document.getElementById('member-error').style.display = 'none', 4000);
+  }
+}
+
+async function deleteMember(id, name) {
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+  const { error } = await db.from('members').delete().eq('id', id);
+  if (!error) await loadAdminMembers();
+  else alert('削除に失敗しました。RLSの設定を確認してください。');
+}
 
 
 
