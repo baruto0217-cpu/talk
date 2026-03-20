@@ -2,664 +2,213 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>救急振り返りルーム</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* ===== リセット & 変数 ===== */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#f5f4f0; --surface:#fff; --surface2:#f0efe9;
+  --border:rgba(0,0,0,.10); --border2:rgba(0,0,0,.18);
+  --text:#1a1a18; --text2:#5a5a56; --text3:#9a9a94;
+  --teal:#0f6e56; --teal-bg:#e1f5ee; --teal-bd:#5dcaa5;
+  --coral:#993c1d; --coral-bg:#faece7; --coral-bd:#f0997b;
+  --blue:#185fa5; --blue-bg:#e6f1fb; --blue-bd:#85b7eb;
+  --amber:#854f0b; --amber-bg:#faeeda;
+  --purple:#534ab7; --purple-bg:#eeedfe;
+  --red:#a32d2d; --red-bg:#fcebeb;
+  --radius:10px; --radius-sm:6px;
+}
+html,body { height:100%; font-family:'Hiragino Koshi Gothic Pro','ヒラギノ角ゴ Pro','Yu Gothic','YuGothic','Meiryo',sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; -webkit-text-size-adjust:100%; }
+.hidden{display:none!important}
+button{cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+textarea,input{-webkit-appearance:none;appearance:none}
+.screen{display:none}
+.screen.active{display:flex}
 
-  :root {
-    --bg:       #f5f4f0;
-    --surface:  #ffffff;
-    --surface2: #f0efe9;
-    --border:   rgba(0,0,0,0.10);
-    --border2:  rgba(0,0,0,0.18);
-    --text:     #1a1a18;
-    --text2:    #5a5a56;
-    --text3:    #9a9a94;
-    --teal:     #0f6e56;
-    --teal-bg:  #e1f5ee;
-    --teal-bd:  #5dcaa5;
-    --coral:    #993c1d;
-    --coral-bg: #faece7;
-    --coral-bd: #f0997b;
-    --blue:     #185fa5;
-    --blue-bg:  #e6f1fb;
-    --blue-bd:  #85b7eb;
-    --amber:    #854f0b;
-    --amber-bg: #faeeda;
-    --purple:   #534ab7;
-    --purple-bg:#eeedfe;
-    --red:      #a32d2d;
-    --red-bg:   #fcebeb;
-    --radius:   10px;
-    --radius-sm:6px;
-  }
+/* ログイン */
+#screen-login{min-height:100dvh;align-items:center;justify-content:center;background:var(--bg);padding:1rem}
+.login-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:2rem 1.6rem;width:100%;max-width:380px}
+.login-logo{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:3px}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:1.6rem}
+.login-step{display:flex;flex-direction:column;gap:14px}
+.login-step.hidden{display:none}
+.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.field-input{width:100%;font-size:16px;padding:12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;transition:border-color .15s}
+.field-input:focus{outline:none;border-color:var(--teal)}
+.btn-primary{width:100%;padding:13px;font-size:15px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:#fff;transition:opacity .15s;min-height:48px}
+.btn-primary:active{opacity:.75}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.error-msg{font-size:12px;color:var(--red);background:var(--red-bg);border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:8px 10px;display:none}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto}
+.name-btn{padding:12px 8px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);text-align:center;transition:all .12s;min-height:52px}
+.name-btn.selected{border:2px solid var(--teal);background:var(--teal-bg);color:var(--teal);font-weight:600}
+.name-role{font-size:10px;color:var(--text3);margin-top:2px}
+.name-btn.selected .name-role{color:var(--teal)}
 
-  html, body { height: 100%; font-family: 'Hiragino Koshi Gothic Pro', 'ヒラギノ角ゴ Pro', 'Yu Gothic', 'YuGothic', 'Meiryo', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+/* チャット画面 */
+#screen-chat{height:100dvh;flex-direction:column}
 
-  /* ===== ユーティリティ ===== */
-  .hidden { display: none !important; }
-  button { cursor: pointer; font-family: inherit; }
+/* ドロワーオーバーレイ */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50}
+.sidebar-overlay.open{display:block}
 
-  /* ===== 画面管理 ===== */
-  .screen { display: none; }
-  .screen.active { display: flex; }
+/* サイドバー */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--surface);display:flex;flex-direction:column;z-index:51;transform:translateX(-100%);transition:transform .25s ease;border-right:0.5px solid var(--border2)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:16px 14px 12px;border-bottom:0.5px solid var(--border)}
+.sidebar-title{font-size:14px;font-weight:700;color:var(--text)}
+.sidebar-user{font-size:11px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:5px}
+.sidebar-user-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.sidebar-section-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px 4px}
+.case-list{flex:1;overflow-y:auto;padding:4px 8px}
+.case-item{padding:10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:2px;border:0.5px solid transparent;transition:all .12s}
+.case-item:active{background:var(--surface2)}
+.case-item.active{background:var(--teal-bg);border-color:var(--teal-bd)}
+.case-item-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.case-item.active .case-item-title{color:var(--teal)}
+.case-item-meta{font-size:11px;color:var(--text3);margin-top:1px}
+.case-item-row{display:flex;align-items:center;gap:6px}
+.case-del-btn{flex-shrink:0;font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
+.case-item:hover .case-del-btn,.case-item.active .case-del-btn{opacity:1}
+.case-del-btn:active{color:var(--red)}
+.sidebar-footer{padding:8px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:5px}
+.sidebar-btn{width:100%;padding:12px;font-size:13px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text2);text-align:left;transition:background .12s;min-height:44px}
+.sidebar-btn:active{background:var(--surface2)}
+.sidebar-btn.admin{color:var(--amber);border-color:#fac775}
 
-  /* =====================
-     ログイン画面
-  ===================== */
-  #screen-login {
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-  }
-  .login-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 2.2rem 2rem;
-    width: 100%;
-    max-width: 380px;
-  }
-  .login-logo {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.5px;
-    margin-bottom: 4px;
-  }
-  .login-sub {
-    font-size: 12px;
-    color: var(--text3);
-    margin-bottom: 1.8rem;
-  }
-  .login-step { display: flex; flex-direction: column; gap: 14px; }
-  .login-step.hidden { display: none; }
-  .field-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 5px;
-  }
-  .field-input {
-    width: 100%;
-    font-size: 14px;
-    padding: 10px 12px;
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    transition: border-color 0.15s;
-  }
-  .field-input:focus { outline: none; border-color: var(--teal); }
-  .btn-primary {
-    width: 100%;
-    padding: 11px;
-    font-size: 14px;
-    font-weight: 600;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--text);
-    color: #fff;
-    transition: opacity 0.15s;
-  }
-  .btn-primary:hover { opacity: 0.82; }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .error-msg {
-    font-size: 12px;
-    color: var(--red);
-    background: var(--red-bg);
-    border: 0.5px solid #f09595;
-    border-radius: var(--radius-sm);
-    padding: 8px 10px;
-    display: none;
-  }
-  .name-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    max-height: 260px;
-    overflow-y: auto;
-  }
-  .name-btn {
-    padding: 10px 8px;
-    font-size: 13px;
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface2);
-    color: var(--text);
-    text-align: center;
-    transition: all 0.12s;
-  }
-  .name-btn:hover { border-color: var(--border2); background: var(--surface); }
-  .name-btn.selected {
-    border: 2px solid var(--teal);
-    background: var(--teal-bg);
-    color: var(--teal);
-    font-weight: 600;
-  }
-  .name-role { font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .name-btn.selected .name-role { color: var(--teal); }
+/* チャット本体 */
+.chat-body{flex:1;display:flex;flex-direction:column;min-height:0}
+.mobile-header{height:52px;background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
+.mobile-header-title{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hamburger-btn{width:40px;height:40px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
 
-  /* =====================
-     チャット画面
-  ===================== */
-  #screen-chat {
-    height: 100vh;
-    flex-direction: row;
-  }
+.case-header{padding:10px 14px;border-bottom:0.5px solid var(--border);background:var(--surface);display:none}
+.case-header.visible{display:block}
+.case-header-title{font-size:14px;font-weight:700;color:var(--text)}
+.case-header-sub{font-size:11px;color:var(--text3);margin-top:1px;margin-bottom:8px}
+.tag-filters{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px}
+.tag-filters::-webkit-scrollbar{display:none}
+.tag-filter-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);white-space:nowrap;transition:all .12s;flex-shrink:0;min-height:30px}
+.tag-filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
 
-  /* サイドバー */
-  .sidebar {
-    width: 220px;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border-right: 0.5px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  .sidebar-header {
-    padding: 14px 14px 10px;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
-  .sidebar-user {
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: 3px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .sidebar-user-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--teal);
-    flex-shrink: 0;
-  }
-  .case-list { flex: 1; overflow-y: auto; padding: 8px; }
-  .case-item {
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    margin-bottom: 3px;
-    border: 0.5px solid transparent;
-    transition: all 0.12s;
-  }
-  .case-item:hover { background: var(--surface); }
-  .case-item.active {
-    background: var(--surface);
-    border-color: var(--border2);
-  }
-  .case-item-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .case-item-meta { font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .sidebar-footer { padding: 8px; border-top: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
-  .sidebar-btn {
-    width: 100%;
-    padding: 8px 10px;
-    font-size: 12px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: transparent;
-    color: var(--text2);
-    text-align: left;
-    transition: background 0.12s;
-  }
-  .sidebar-btn:hover { background: var(--surface); }
-  .sidebar-btn.admin { color: var(--amber); border-color: var(--amber-bg); }
+.messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch}
+.no-case{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;text-align:center;padding:2rem}
 
-  /* メインエリア */
-  .main { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
-  .main-header {
-    padding: 12px 18px;
-    border-bottom: 0.5px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .main-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .main-sub { font-size: 11px; color: var(--text3); }
-  .tag-filters { display: flex; gap: 5px; flex-wrap: wrap; }
-  .tag-filter-btn {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    border: 0.5px solid var(--border);
-    background: var(--surface2);
-    color: var(--text2);
-    transition: all 0.12s;
-  }
-  .tag-filter-btn:hover, .tag-filter-btn.active { border-color: var(--border2); background: var(--surface); }
+.msg{display:flex;flex-direction:column;gap:4px}
+.msg-header{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--surface2);border:0.5px solid var(--border2);color:var(--text2)}
+.msg-name{font-size:12px;font-weight:600;color:var(--text2)}
+.msg-time{font-size:10px;color:var(--text3)}
+.tag-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.tag-good{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
+.tag-imp{background:var(--coral-bg);color:var(--coral);border:0.5px solid var(--coral-bd)}
+.tag-q{background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd)}
+.msg-body{font-size:13px;color:var(--text);line-height:1.65;margin-left:35px;background:var(--surface2);padding:9px 12px;border-radius:0 var(--radius-sm) var(--radius-sm) var(--radius-sm);border:0.5px solid var(--border);word-break:break-word}
+.msg-actions{margin-left:35px;margin-top:3px;display:flex;align-items:center;gap:10px}
+.act-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:4px 0;display:flex;align-items:center;gap:3px;min-height:28px}
+.act-btn:active{color:var(--text2)}
 
-  /* メッセージ一覧 */
-  .messages { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .no-case { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text3); font-size: 13px; }
+.replies-wrap{overflow:hidden;transition:max-height .25s ease,opacity .2s ease}
+.replies-wrap.collapsed{max-height:0!important;opacity:0}
+.replies{margin-left:35px;margin-top:8px;border-left:2px solid var(--border2);padding-left:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
+.reply{display:flex;flex-direction:column;gap:3px}
+.reply-header{display:flex;align-items:center;gap:6px}
+.reply-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:var(--surface2);border:0.5px solid var(--border2);color:var(--text2)}
+.reply-name{font-size:11px;font-weight:600;color:var(--text2)}
+.reply-time{font-size:10px;color:var(--text3)}
+.reply-body{font-size:12px;color:var(--text);line-height:1.6;margin-left:28px;background:var(--surface2);padding:6px 10px;border-radius:0 var(--radius-sm) var(--radius-sm) var(--radius-sm);border:0.5px solid var(--border);word-break:break-word}
 
-  /* メッセージ */
-  .msg { display: flex; flex-direction: column; gap: 4px; }
-  .msg-header { display: flex; align-items: center; gap: 7px; }
-  .avatar {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border: 0.5px solid var(--border2);
-    color: var(--text2);
-  }
-  .msg-name { font-size: 12px; font-weight: 600; color: var(--text2); }
-  .msg-time { font-size: 10px; color: var(--text3); }
-  .tag-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    font-weight: 600;
-  }
-  .tag-good { background: var(--teal-bg); color: var(--teal); border: 0.5px solid var(--teal-bd); }
-  .tag-imp  { background: var(--coral-bg); color: var(--coral); border: 0.5px solid var(--coral-bd); }
-  .tag-q    { background: var(--blue-bg); color: var(--blue); border: 0.5px solid var(--blue-bd); }
-  .msg-body {
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.65;
-    margin-left: 33px;
-    background: var(--surface2);
-    padding: 8px 12px;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
-    border: 0.5px solid var(--border);
-  }
-  .msg-actions {
-    margin-left: 33px;
-    margin-top: 3px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .act-btn {
-    font-size: 11px;
-    color: var(--text3);
-    background: none;
-    border: none;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    transition: color 0.12s;
-  }
-  .act-btn:hover { color: var(--text2); }
+.reply-input-box{margin-left:35px;margin-top:6px;border-left:2px solid var(--teal-bd);padding-left:12px}
+.reply-quote{font-size:11px;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.reply-cancel-btn{background:none;border:none;font-size:11px;color:var(--text3);padding:4px;min-height:28px}
+.reply-row{display:flex;gap:6px;align-items:flex-end}
+.reply-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
+.reply-ta:focus{outline:none;border-color:var(--teal)}
+.reply-send-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface);color:var(--text);height:48px;white-space:nowrap}
+.reply-send-btn:active{background:var(--surface2)}
 
-  /* リプライ */
-  .replies-wrap {
-    overflow: hidden;
-    transition: max-height 0.25s ease, opacity 0.2s ease;
-  }
-  .replies-wrap.collapsed { max-height: 0 !important; opacity: 0; }
-  .replies {
-    margin-left: 33px;
-    margin-top: 8px;
-    border-left: 2px solid var(--border2);
-    padding-left: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: 4px;
-  }
-  .reply { display: flex; flex-direction: column; gap: 3px; }
-  .reply-header { display: flex; align-items: center; gap: 6px; }
-  .reply-avatar {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 700;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border: 0.5px solid var(--border2);
-    color: var(--text2);
-  }
-  .reply-name { font-size: 11px; font-weight: 600; color: var(--text2); }
-  .reply-time { font-size: 10px; color: var(--text3); }
-  .reply-body {
-    font-size: 12px;
-    color: var(--text);
-    line-height: 1.6;
-    margin-left: 26px;
-    background: var(--surface2);
-    padding: 6px 10px;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
-    border: 0.5px solid var(--border);
-  }
+.input-area{padding:10px 14px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:0.5px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.input-controls{display:flex;align-items:center;gap:5px;overflow-x:auto}
+.input-controls::-webkit-scrollbar{display:none}
+.ctrl-label{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0}
+.tag-sel-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);white-space:nowrap;flex-shrink:0;min-height:30px}
+.tag-sel-btn.sel-good{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);font-weight:600}
+.tag-sel-btn.sel-imp{background:var(--coral-bg);border-color:var(--coral-bd);color:var(--coral);font-weight:600}
+.tag-sel-btn.sel-q{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);font-weight:600}
+.anon-label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+.msg-ta{flex:1;resize:none;height:54px;font-size:15px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
+.msg-ta:focus{outline:none;border-color:var(--teal)}
+.send-btn{padding:9px 18px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;height:54px;flex-shrink:0}
+.send-btn:active{opacity:.75}
+.send-btn:disabled{opacity:.5}
 
-  /* リプライ入力 */
-  .reply-input-box {
-    margin-left: 33px;
-    margin-top: 6px;
-    border-left: 2px solid var(--teal-bd);
-    padding-left: 12px;
-  }
-  .reply-quote {
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .reply-cancel-btn { background: none; border: none; font-size: 11px; color: var(--text3); padding: 0; }
-  .reply-cancel-btn:hover { color: var(--text2); }
-  .reply-row { display: flex; gap: 6px; align-items: flex-end; }
-  .reply-ta {
-    flex: 1;
-    resize: none;
-    height: 48px;
-    font-size: 12px;
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius-sm);
-    padding: 7px 9px;
-    font-family: inherit;
-    color: var(--text);
-    background: var(--surface);
-    line-height: 1.5;
-  }
-  .reply-ta:focus { outline: none; border-color: var(--teal); }
-  .reply-send-btn {
-    padding: 7px 12px;
-    font-size: 12px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface);
-    color: var(--text);
-    height: 48px;
-    white-space: nowrap;
-    transition: background 0.12s;
-  }
-  .reply-send-btn:hover { background: var(--surface2); }
+/* 管理者画面 */
+#screen-admin{min-height:100dvh;flex-direction:column;background:var(--bg)}
+.admin-topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--surface);border-bottom:0.5px solid var(--border2);flex-shrink:0}
+.admin-topbar-title{font-size:14px;font-weight:700;color:var(--text)}
+.admin-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--amber-bg);color:var(--amber);font-weight:600}
+.admin-back{font-size:13px;color:var(--text3);background:none;border:none;margin-left:auto;min-height:36px;padding:0 4px}
+.admin-scroll{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.admin-panel{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);overflow:hidden}
+.admin-panel-header{padding:12px 16px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.member-table{width:100%;border-collapse:collapse}
+.member-table th{font-size:11px;color:var(--text3);text-align:left;padding:8px 14px;border-bottom:0.5px solid var(--border);font-weight:600}
+.member-table td{font-size:13px;padding:12px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle}
+.member-table tr:last-child td{border-bottom:none}
+.role-pill{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.role-leader{background:var(--purple-bg);color:var(--purple)}
+.role-qs{background:var(--teal-bg);color:var(--teal)}
+.role-member{background:var(--surface2);color:var(--text2)}
+.del-btn{font-size:11px;color:var(--red);background:none;border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:5px 10px;min-height:32px}
+.del-btn:active{background:var(--red-bg)}
+.admin-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.admin-card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.admin-field{display:flex;flex-direction:column;gap:5px}
+.admin-field label{font-size:11px;color:var(--text3)}
+.admin-field select{font-size:14px;padding:10px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;color:var(--text);background:var(--surface);width:100%}
+.admin-add-btn{width:100%;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:#fff;min-height:46px}
+.admin-add-btn:active{opacity:.75}
+.pw-row{display:flex;gap:6px}
+.pw-row .field-input{flex:1;font-size:14px;padding:10px}
+.pw-update-btn{font-size:12px;padding:10px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);white-space:nowrap}
+.success-msg{font-size:12px;color:var(--teal);background:var(--teal-bg);border-radius:var(--radius-sm);padding:7px 10px;display:none}
 
-  /* 新規投稿エリア */
-  .input-area {
-    padding: 12px 18px;
-    border-top: 0.5px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .input-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .ctrl-label { font-size: 11px; color: var(--text3); }
-  .tag-sel-btn {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    border: 0.5px solid var(--border2);
-    background: transparent;
-    color: var(--text2);
-    transition: all 0.12s;
-  }
-  .tag-sel-btn.sel-good { background: var(--teal-bg); border-color: var(--teal-bd); color: var(--teal); font-weight: 600; }
-  .tag-sel-btn.sel-imp  { background: var(--coral-bg); border-color: var(--coral-bd); color: var(--coral); font-weight: 600; }
-  .tag-sel-btn.sel-q    { background: var(--blue-bg); border-color: var(--blue-bd); color: var(--blue); font-weight: 600; }
-  .anon-label { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); margin-left: auto; cursor: pointer; user-select: none; }
-  .input-row { display: flex; gap: 8px; align-items: flex-end; }
-  .msg-ta {
-    flex: 1;
-    resize: none;
-    height: 54px;
-    font-size: 13px;
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius-sm);
-    padding: 8px 11px;
-    font-family: inherit;
-    color: var(--text);
-    background: var(--surface);
-    line-height: 1.5;
-  }
-  .msg-ta:focus { outline: none; border-color: var(--teal); }
-  .send-btn {
-    padding: 9px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: var(--text);
-    color: #fff;
-    height: 54px;
-    transition: opacity 0.12s;
-  }
-  .send-btn:hover { opacity: 0.82; }
+/* モーダル（下からスライド） */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;z-index:100}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:1.4rem;padding-bottom:max(1.4rem,env(safe-area-inset-bottom));width:100%;max-width:540px;border:0.5px solid var(--border2)}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.2rem}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:1.2rem}
+.modal-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:1.2rem}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{padding:11px 18px;font-size:14px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);min-height:46px}
 
-  /* =====================
-     管理者画面
-  ===================== */
-  #screen-admin {
-    min-height: 100vh;
-    flex-direction: column;
-    background: var(--bg);
-  }
-  .admin-topbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 20px;
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--border2);
-  }
-  .admin-topbar-title { font-size: 14px; font-weight: 700; color: var(--text); }
-  .admin-badge {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    background: var(--amber-bg);
-    color: var(--amber);
-    font-weight: 600;
-  }
-  .admin-back {
-    font-size: 12px;
-    color: var(--text3);
-    background: none;
-    border: none;
-    margin-left: auto;
-    transition: color 0.12s;
-  }
-  .admin-back:hover { color: var(--text2); }
-  .admin-content {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 0;
-    flex: 1;
-    max-width: 900px;
-    width: 100%;
-    margin: 24px auto;
-    padding: 0 20px;
-    align-items: start;
-  }
-  .admin-panel {
-    background: var(--surface);
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .admin-panel-header {
-    padding: 12px 16px;
-    border-bottom: 0.5px solid var(--border);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .member-table { width: 100%; border-collapse: collapse; }
-  .member-table th {
-    font-size: 11px;
-    color: var(--text3);
-    text-align: left;
-    padding: 8px 16px;
-    border-bottom: 0.5px solid var(--border);
-    font-weight: 600;
-  }
-  .member-table td {
-    font-size: 13px;
-    padding: 10px 16px;
-    border-bottom: 0.5px solid var(--border);
-    color: var(--text);
-    vertical-align: middle;
-  }
-  .member-table tr:last-child td { border-bottom: none; }
-  .role-pill { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
-  .role-leader { background: var(--purple-bg); color: var(--purple); }
-  .role-qs     { background: var(--teal-bg);   color: var(--teal);   }
-  .role-member { background: var(--surface2);  color: var(--text2);  }
-  .del-btn {
-    font-size: 11px;
-    color: var(--red);
-    background: none;
-    border: 0.5px solid #f09595;
-    border-radius: var(--radius-sm);
-    padding: 3px 8px;
-    transition: background 0.12s;
-  }
-  .del-btn:hover { background: var(--red-bg); }
-  .admin-side { display: flex; flex-direction: column; gap: 12px; margin-left: 14px; }
-  .admin-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .admin-card-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .admin-field { display: flex; flex-direction: column; gap: 5px; }
-  .admin-field label { font-size: 11px; color: var(--text3); }
-  .admin-field select {
-    font-size: 13px;
-    padding: 8px 10px;
-    border: 0.5px solid var(--border2);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    color: var(--text);
-    background: var(--surface);
-    width: 100%;
-  }
-  .admin-add-btn {
-    width: 100%;
-    padding: 9px;
-    font-size: 13px;
-    font-weight: 600;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--text);
-    color: #fff;
-    transition: opacity 0.12s;
-  }
-  .admin-add-btn:hover { opacity: 0.82; }
-  .pw-row { display: flex; gap: 6px; }
-  .pw-row .field-input { flex: 1; font-size: 12px; padding: 7px 9px; }
-  .pw-update-btn {
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    white-space: nowrap;
-    transition: background 0.12s;
-  }
-  .pw-update-btn:hover { background: var(--surface); }
-  .success-msg {
-    font-size: 11px;
-    color: var(--teal);
-    background: var(--teal-bg);
-    border-radius: var(--radius-sm);
-    padding: 5px 8px;
-    display: none;
-  }
-
-  /* =====================
-     モーダル（症例作成）
-  ===================== */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.38);
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 1.6rem;
-    width: 100%;
-    max-width: 400px;
-    border: 0.5px solid var(--border2);
-  }
-  .modal-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 1.2rem; }
-  .modal-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.2rem; }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
-  .btn-cancel {
-    padding: 9px 16px;
-    font-size: 13px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text2);
-    transition: background 0.12s;
-  }
-  .btn-cancel:hover { background: var(--surface); }
-
-  /* スクロールバー */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
 </head>
 <body>
 
-<!-- ===================== ログイン画面 ===================== -->
+<!-- ログイン画面 -->
 <div id="screen-login" class="screen active">
   <div class="login-card">
     <div class="login-logo">救急振り返りルーム</div>
-    <div class="login-sub">署内スタッフ専用システム</div>
-
-    <!-- Step1: 合言葉 -->
+    <div class="login-sub">署内スタッフ専用</div>
     <div class="login-step" id="step1">
       <div>
         <div class="field-label">合言葉</div>
-        <input class="field-input" type="password" id="pw-input" placeholder="合言葉を入力...">
+        <input class="field-input" type="password" id="pw-input" placeholder="合言葉を入力..." autocomplete="off">
       </div>
       <div class="error-msg" id="pw-error">合言葉が違います</div>
       <button class="btn-primary" onclick="submitPassphrase()">次へ</button>
     </div>
-
-    <!-- Step2: 名前選択 -->
     <div class="login-step hidden" id="step2">
       <div id="admin-direct-wrap" class="hidden">
         <div style="font-size:12px;color:var(--text2);background:var(--amber-bg);border:0.5px solid #fac775;border-radius:var(--radius-sm);padding:10px 12px;line-height:1.6;">
-          管理者合言葉で認証されました。<br>名前を選ばずに管理者画面へ入ることもできます。
+          管理者合言葉で認証されました。名前を選ばずに管理者画面へ入ることもできます。
         </div>
         <button class="btn-primary" style="background:var(--amber);" onclick="enterAdminDirect()">管理者画面へ入る</button>
         <div style="font-size:11px;color:var(--text3);text-align:center;">または下から名前を選んでチャットに参加</div>
@@ -676,9 +225,10 @@
   </div>
 </div>
 
-<!-- ===================== チャット画面 ===================== -->
+<!-- チャット画面 -->
 <div id="screen-chat" class="screen">
-  <div class="sidebar">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-title">救急振り返り</div>
       <div class="sidebar-user">
@@ -686,22 +236,25 @@
         <span id="sidebar-username">---</span>
       </div>
     </div>
+    <div class="sidebar-section-label">症例一覧</div>
     <div class="case-list" id="case-list">
-      <div style="font-size:12px;color:var(--text3);padding:8px;">症例を読み込み中...</div>
+      <div style="font-size:12px;color:var(--text3);padding:8px;">読み込み中...</div>
     </div>
     <div class="sidebar-footer">
-      <button class="sidebar-btn" onclick="openNewCaseModal()">＋ 新規症例</button>
-      <button class="sidebar-btn admin" id="admin-btn" onclick="goAdmin()">⚙ 管理者画面</button>
+      <button class="sidebar-btn" onclick="openNewCaseModal();closeSidebar()">＋ 新規症例を追加</button>
+      <button class="sidebar-btn admin" id="admin-btn" onclick="goAdmin()" style="display:none;">⚙ 管理者画面</button>
       <button class="sidebar-btn" onclick="logout()">ログアウト</button>
     </div>
   </div>
 
-  <div class="main">
-    <div class="main-header" id="main-header" style="display:none;">
-      <div style="flex:1;min-width:0;">
-        <div class="main-title" id="main-title">---</div>
-        <div class="main-sub" id="main-sub">---</div>
-      </div>
+  <div class="chat-body">
+    <div class="mobile-header">
+      <button class="hamburger-btn" onclick="openSidebar()">☰</button>
+      <div class="mobile-header-title" id="mobile-header-title">症例を選択してください</div>
+    </div>
+    <div class="case-header" id="case-header">
+      <div class="case-header-title" id="case-header-title"></div>
+      <div class="case-header-sub" id="case-header-sub"></div>
       <div class="tag-filters">
         <button class="tag-filter-btn active" data-tag="all" onclick="filterTag(this)">すべて</button>
         <button class="tag-filter-btn" data-tag="良かった点" onclick="filterTag(this)">良かった点</button>
@@ -709,11 +262,9 @@
         <button class="tag-filter-btn" data-tag="質問" onclick="filterTag(this)">質問</button>
       </div>
     </div>
-
     <div class="messages" id="messages">
-      <div class="no-case">← 症例を選択してください</div>
+      <div class="no-case">☰ メニューから症例を選択してください</div>
     </div>
-
     <div class="input-area" id="input-area" style="display:none;">
       <div class="input-controls">
         <span class="ctrl-label">タグ：</span>
@@ -725,20 +276,20 @@
       </div>
       <div class="input-row">
         <textarea class="msg-ta" id="msg-input" placeholder="振り返りを入力..."></textarea>
-        <button class="send-btn" onclick="sendMessage()">送信</button>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">送信</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===================== 管理者画面 ===================== -->
+<!-- 管理者画面 -->
 <div id="screen-admin" class="screen">
   <div class="admin-topbar">
     <div class="admin-topbar-title">管理者画面</div>
     <span class="admin-badge">管理者</span>
-    <button class="admin-back" onclick="goChat()">← チャットに戻る</button>
+    <button class="admin-back" onclick="goChat()">← 戻る</button>
   </div>
-  <div class="admin-content">
+  <div class="admin-scroll">
     <div class="admin-panel">
       <div class="admin-panel-header">登録隊員一覧</div>
       <table class="member-table">
@@ -746,50 +297,46 @@
         <tbody id="admin-member-tbody"></tbody>
       </table>
     </div>
-    <div class="admin-side">
-      <div class="admin-card">
-        <div class="admin-card-title">隊員を追加</div>
-        <div class="admin-field">
-          <label>氏名</label>
-          <input class="field-input" type="text" id="new-member-name" placeholder="例：伊藤 健">
-        </div>
-        <div class="admin-field">
-          <label>役職</label>
-          <select id="new-member-role">
-            <option>隊長</option>
-            <option>救命士</option>
-            <option selected>隊員</option>
-          </select>
-        </div>
-        <button class="admin-add-btn" onclick="addMember()">追加する</button>
-        <div class="success-msg" id="member-success">追加しました</div>
+    <div class="admin-card">
+      <div class="admin-card-title">隊員を追加</div>
+      <div class="admin-field">
+        <label>氏名</label>
+        <input class="field-input" type="text" id="new-member-name" placeholder="例：伊藤 健">
       </div>
-
-      <div class="admin-card">
-        <div class="admin-card-title">合言葉の変更</div>
-        <div class="admin-field">
-          <label>一般合言葉</label>
-          <div class="pw-row">
-            <input class="field-input" type="text" id="pw-general" placeholder="新しい合言葉">
-            <button class="pw-update-btn" onclick="updatePassphrase('passphrase_general','pw-general')">更新</button>
-          </div>
-        </div>
-        <div class="admin-field">
-          <label>管理者合言葉</label>
-          <div class="pw-row">
-            <input class="field-input" type="text" id="pw-admin" placeholder="新しい合言葉">
-            <button class="pw-update-btn" onclick="updatePassphrase('passphrase_admin','pw-admin')">更新</button>
-          </div>
-        </div>
-        <div class="success-msg" id="pw-success">更新しました</div>
+      <div class="admin-field">
+        <label>役職</label>
+        <select id="new-member-role">
+          <option>隊長</option><option>救命士</option><option selected>隊員</option>
+        </select>
       </div>
+      <button class="admin-add-btn" onclick="addMember()">追加する</button>
+      <div class="success-msg" id="member-success">追加しました</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">合言葉の変更</div>
+      <div class="admin-field">
+        <label>一般合言葉</label>
+        <div class="pw-row">
+          <input class="field-input" type="text" id="pw-general" placeholder="新しい合言葉" autocomplete="off">
+          <button class="pw-update-btn" onclick="updatePassphrase('passphrase_general','pw-general')">更新</button>
+        </div>
+      </div>
+      <div class="admin-field">
+        <label>管理者合言葉</label>
+        <div class="pw-row">
+          <input class="field-input" type="text" id="pw-admin" placeholder="新しい合言葉" autocomplete="off">
+          <button class="pw-update-btn" onclick="updatePassphrase('passphrase_admin','pw-admin')">更新</button>
+        </div>
+      </div>
+      <div class="success-msg" id="pw-success">更新しました</div>
     </div>
   </div>
 </div>
 
-<!-- ===================== 症例作成モーダル ===================== -->
+<!-- 症例作成モーダル -->
 <div class="modal-overlay" id="modal-new-case">
   <div class="modal">
+    <div class="modal-handle"></div>
     <div class="modal-title">新規症例スレッド</div>
     <div class="modal-fields">
       <div>
@@ -807,60 +354,68 @@
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeNewCaseModal()">キャンセル</button>
-      <button class="btn-primary" style="width:auto;padding:9px 20px;" onclick="createCase()">作成</button>
+      <button class="btn-primary" style="width:auto;padding:11px 22px;" onclick="createCase()">作成</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ==================================================
+/* ================================================
    設定（自分のSupabase情報に書き換えてください）
-================================================== */
-const SUPABASE_URL = 'https://furhbsojbomwazispcrr.supabase.co';
+================================================ */
+const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
 
-/* ==================================================
-   Supabase初期化
-================================================== */
+/* ================================================
+   初期化
+================================================ */
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ==================================================
-   状態管理
-================================================== */
-let currentUser = null;   // { id, display_name, role, is_admin }
-let currentCase = null;   // { id, title, occurred_at, ... }
-let currentTag  = 'なし';
-let filterTagVal = 'all';
+let currentUser     = null;
+let currentCase     = null;
+let currentTag      = 'なし';
+let filterTagVal    = 'all';
 let realtimeChannel = null;
 
-/* ==================================================
-   初期化
-================================================== */
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('kyukyu_user');
-  if (saved) {
-    currentUser = JSON.parse(saved);
-    await startChat();
-  }
+  if (saved) { currentUser = JSON.parse(saved); startChat(); }
   document.getElementById('pw-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') submitPassphrase();
   });
+  document.getElementById('msg-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
 });
 
-/* ==================================================
+/* ================================================
+   サイドバー開閉
+================================================ */
+function openSidebar()  {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ================================================
    ログイン
-================================================== */
+================================================ */
 async function submitPassphrase() {
   const input = document.getElementById('pw-input').value.trim();
   const errEl = document.getElementById('pw-error');
   errEl.style.display = 'none';
 
-  // Supabaseから合言葉を取得して照合
   const { data, error } = await db.from('settings').select('key,value');
-  if (error || !data) { errEl.textContent = 'サーバーに接続できません'; errEl.style.display = 'block'; return; }
-
-  const settings = Object.fromEntries(data.map(r => [r.key, r.value]));
+  if (error || !data) {
+    errEl.textContent = 'サーバーに接続できません';
+    errEl.style.display = 'block';
+    return;
+  }
+  const settings  = Object.fromEntries(data.map(r => [r.key, r.value]));
   const isAdmin   = input === settings['passphrase_admin'];
   const isGeneral = input === settings['passphrase_general'];
 
@@ -870,26 +425,22 @@ async function submitPassphrase() {
     return;
   }
 
-  // 隊員一覧を取得
   const { data: members } = await db.from('members').select('*').order('role').order('display_name');
   const grid = document.getElementById('name-grid');
   grid.innerHTML = '';
   (members || []).forEach(m => {
     const btn = document.createElement('button');
-    btn.className = 'name-btn';
-    btn.dataset.id   = m.id;
-    btn.dataset.name = m.display_name;
-    btn.dataset.role = m.role;
+    btn.className     = 'name-btn';
+    btn.dataset.id    = m.id;
+    btn.dataset.name  = m.display_name;
+    btn.dataset.role  = m.role;
     btn.dataset.admin = isAdmin ? '1' : '0';
-    btn.innerHTML = `${m.display_name}<div class="name-role">${m.role}</div>`;
-    btn.onclick = () => selectMember(btn);
+    btn.innerHTML     = `${m.display_name}<div class="name-role">${m.role}</div>`;
+    btn.onclick       = () => selectMember(btn);
     grid.appendChild(btn);
   });
 
-  if (isAdmin) {
-    document.getElementById('admin-direct-wrap').classList.remove('hidden');
-  }
-
+  if (isAdmin) document.getElementById('admin-direct-wrap').classList.remove('hidden');
   document.getElementById('step1').classList.add('hidden');
   document.getElementById('step2').classList.remove('hidden');
 }
@@ -898,6 +449,13 @@ function selectMember(btn) {
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   document.getElementById('enter-btn').disabled = false;
+}
+
+async function enterAdminDirect() {
+  currentUser = { id: 'admin', display_name: '管理者', role: '管理者', is_admin: true };
+  localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
+  showScreen('admin');
+  await loadAdminMembers();
 }
 
 async function enterChat() {
@@ -913,73 +471,86 @@ async function enterChat() {
   await startChat();
 }
 
-async function enterAdminDirect() {
-  currentUser = {
-    id:           'admin',
-    display_name: '管理者',
-    role:         '管理者',
-    is_admin:     true
-  };
-  localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
-  showScreen('admin');
-  await loadAdminMembers();
-}
-
 async function startChat() {
   showScreen('chat');
   document.getElementById('sidebar-username').textContent =
     `${currentUser.display_name}（${currentUser.role}）`;
-  document.getElementById('admin-btn').style.display =
-    currentUser.is_admin ? '' : 'none';
+  document.getElementById('admin-btn').style.display = currentUser.is_admin ? '' : 'none';
   await loadCases();
 }
 
 function logout() {
   localStorage.removeItem('kyukyu_user');
-  currentUser = null;
-  currentCase = null;
-  if (realtimeChannel) db.removeChannel(realtimeChannel);
+  currentUser = null; currentCase = null;
+  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
   document.getElementById('pw-input').value = '';
   document.getElementById('step1').classList.remove('hidden');
   document.getElementById('step2').classList.add('hidden');
   document.getElementById('name-grid').innerHTML = '';
   document.getElementById('enter-btn').disabled = true;
   document.getElementById('admin-direct-wrap').classList.add('hidden');
+  closeSidebar();
   showScreen('login');
 }
 
-/* ==================================================
+/* ================================================
    症例
-================================================== */
+================================================ */
 async function loadCases() {
   const { data } = await db.from('cases').select('*').order('occurred_at', { ascending: false });
   const list = document.getElementById('case-list');
   list.innerHTML = '';
   if (!data || data.length === 0) {
-    list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px;">症例がありません</div>';
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:10px 4px;">症例がありません</div>';
     return;
   }
   data.forEach(c => {
     const el = document.createElement('div');
-    el.className = 'case-item';
+    el.className  = 'case-item';
     el.dataset.id = c.id;
-    el.innerHTML = `<div class="case-item-title">${esc(c.title)}</div><div class="case-item-meta">${c.occurred_at || ''}</div>`;
-    el.onclick = () => selectCase(c);
+    const delBtn = currentUser && currentUser.is_admin
+      ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>`
+      : '';
+    el.innerHTML  = `
+      <div class="case-item-row">
+        <div class="case-item-title" style="flex:1;min-width:0;">${esc(c.title)}</div>
+        ${delBtn}
+      </div>
+      <div class="case-item-meta">${c.occurred_at||''}</div>`;
+    el.onclick    = () => { selectCase(c); closeSidebar(); };
     list.appendChild(el);
+    if (currentCase && currentCase.id === c.id) el.classList.add('active');
   });
+}
+
+async function deleteCase(event, caseId, caseTitle) {
+  event.stopPropagation();
+  if (!confirm(`「${caseTitle}」を削除しますか？\n投稿されたメッセージもすべて削除されます。`)) return;
+  const { error } = await db.from('cases').delete().eq('id', caseId);
+  if (error) { alert('削除に失敗しました'); return; }
+  if (currentCase && currentCase.id === caseId) {
+    currentCase = null;
+    if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+    document.getElementById('case-header').classList.remove('visible');
+    document.getElementById('input-area').style.display = 'none';
+    document.getElementById('mobile-header-title').textContent = '症例を選択してください';
+    document.getElementById('messages').innerHTML = '<div class="no-case">☰ メニューから症例を選択してください</div>';
+  }
+  await loadCases();
 }
 
 async function selectCase(c) {
   currentCase = c;
-  document.querySelectorAll('.case-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.id === c.id);
-  });
-  document.getElementById('main-header').style.display = '';
-  document.getElementById('input-area').style.display  = '';
-  document.getElementById('main-title').textContent = c.title;
-  document.getElementById('main-sub').textContent   = c.occurred_at || '';
+  document.querySelectorAll('.case-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.id === c.id));
+  document.getElementById('mobile-header-title').textContent = c.title;
+  document.getElementById('case-header').classList.add('visible');
+  document.getElementById('case-header-title').textContent = c.title;
+  document.getElementById('case-header-sub').textContent   = c.occurred_at || '';
+  document.getElementById('input-area').style.display = '';
   filterTagVal = 'all';
-  document.querySelectorAll('.tag-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === 'all'));
+  document.querySelectorAll('.tag-filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tag === 'all'));
   await loadMessages();
   subscribeRealtime();
 }
@@ -1011,58 +582,49 @@ async function createCase() {
   }
 }
 
-/* ==================================================
+/* ================================================
    メッセージ
-================================================== */
+================================================ */
 async function loadMessages() {
+  if (!currentCase) return;
   const { data } = await db.from('messages')
-    .select('*')
-    .eq('case_id', currentCase.id)
-    .order('created_at');
+    .select('*').eq('case_id', currentCase.id).order('created_at');
 
   const container = document.getElementById('messages');
-  container.innerHTML = '';
+  const atBottom  = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
 
-  // 親メッセージだけ抽出
+  container.innerHTML = '';
   const parents  = (data || []).filter(m => !m.parent_id);
   const children = (data || []).filter(m =>  m.parent_id);
 
   if (parents.length === 0) {
-    container.innerHTML = '<div class="no-case">まだ投稿がありません</div>';
+    container.innerHTML = '<div class="no-case">まだ投稿がありません。最初の振り返りを投稿しましょう！</div>';
     return;
   }
-
   parents.forEach(msg => {
     if (filterTagVal !== 'all' && msg.tag !== filterTagVal) return;
-    const replies = children.filter(r => r.parent_id === msg.id);
-    container.appendChild(buildMsgEl(msg, replies));
+    container.appendChild(buildMsgEl(msg, children.filter(r => r.parent_id === msg.id)));
   });
-  container.scrollTop = container.scrollHeight;
+  if (atBottom) container.scrollTop = container.scrollHeight;
 }
 
-function buildMsgEl(msg, replies = []) {
-  const div = document.createElement('div');
+function buildMsgEl(msg, replies) {
+  const div     = document.createElement('div');
   div.className = 'msg';
   div.dataset.id = msg.id;
   const name    = msg.is_anonymous ? '匿名' : esc(msg.display_name);
   const initial = name.charAt(0);
   const tagHTML = msg.tag && msg.tag !== 'なし'
     ? `<span class="tag-badge ${tagClass(msg.tag)}">${esc(msg.tag)}</span>` : '';
-
-  let repliesHTML = '';
-  if (replies.length > 0) {
-    repliesHTML = `
-      <div class="replies-wrap" id="rw-${msg.id}" style="max-height:${replies.length * 80}px;">
-        <div class="replies">${replies.map(r => buildReplyHTML(r)).join('')}</div>
-      </div>`;
-  }
-
+  const repliesHTML = replies.length > 0 ? `
+    <div class="replies-wrap" id="rw-${msg.id}" style="max-height:${replies.length*90+20}px;">
+      <div class="replies">${replies.map(r => buildReplyHTML(r)).join('')}</div>
+    </div>` : '';
   const toggleHTML = replies.length > 0 ? `
     <button class="act-btn" onclick="toggleReplies('${msg.id}',${replies.length})">
-      <span id="ri-${msg.id}">▶</span>
+      <span id="ri-${msg.id}">▼</span>
       <span id="rl-${msg.id}">リプライ ${replies.length}件を非表示</span>
     </button>` : '';
-
   div.innerHTML = `
     <div class="msg-header">
       <div class="avatar">${initial}</div>
@@ -1080,12 +642,11 @@ function buildMsgEl(msg, replies = []) {
 }
 
 function buildReplyHTML(r) {
-  const name    = r.is_anonymous ? '匿名' : esc(r.display_name);
-  const initial = name.charAt(0);
+  const name = r.is_anonymous ? '匿名' : esc(r.display_name);
   return `
     <div class="reply" data-id="${r.id}">
       <div class="reply-header">
-        <div class="reply-avatar">${initial}</div>
+        <div class="reply-avatar">${name.charAt(0)}</div>
         <span class="reply-name">${name}</span>
         <span class="reply-time">${formatTime(r.created_at)}</span>
       </div>
@@ -1093,9 +654,9 @@ function buildReplyHTML(r) {
     </div>`;
 }
 
-/* ==================================================
+/* ================================================
    リプライ 表示/非表示
-================================================== */
+================================================ */
 function toggleReplies(msgId, count) {
   const wrap  = document.getElementById('rw-' + msgId);
   const icon  = document.getElementById('ri-' + msgId);
@@ -1104,10 +665,7 @@ function toggleReplies(msgId, count) {
   const isOpen = !wrap.classList.contains('collapsed');
   if (isOpen) {
     wrap.style.maxHeight = wrap.scrollHeight + 'px';
-    requestAnimationFrame(() => {
-      wrap.style.maxHeight = '0';
-      wrap.classList.add('collapsed');
-    });
+    requestAnimationFrame(() => { wrap.style.maxHeight = '0'; wrap.classList.add('collapsed'); });
     icon.textContent  = '▶';
     label.textContent = `リプライ ${count}件を表示`;
   } else {
@@ -1118,24 +676,18 @@ function toggleReplies(msgId, count) {
   }
 }
 
-/* ==================================================
+/* ================================================
    リプライ入力
-================================================== */
+================================================ */
 function openReplyInput(parentId, toName) {
-  // 同じ親の既存入力欄を閉じる
   document.querySelectorAll('.reply-input-box').forEach(el => el.remove());
-
   const msgEl = document.querySelector(`.msg[data-id="${parentId}"]`);
   if (!msgEl) return;
-
-  // リプライが折りたたまれていたら開く
   const wrap = document.getElementById('rw-' + parentId);
   const rl   = document.getElementById('rl-' + parentId);
   if (wrap && wrap.classList.contains('collapsed') && rl) {
-    const count = parseInt(rl.textContent.match(/\d+/) || [0]) || 0;
-    toggleReplies(parentId, count);
+    toggleReplies(parentId, parseInt(rl.textContent.match(/\d+/)||[0])||0);
   }
-
   const box = document.createElement('div');
   box.className = 'reply-input-box';
   box.innerHTML = `
@@ -1147,39 +699,35 @@ function openReplyInput(parentId, toName) {
       <textarea class="reply-ta" placeholder="リプライを入力..."></textarea>
       <button class="reply-send-btn" onclick="sendReply(this,'${parentId}')">送信</button>
     </div>`;
-
-  if (wrap) wrap.after(box);
-  else msgEl.querySelector('.msg-actions').after(box);
+  (wrap || msgEl.querySelector('.msg-actions')).after(box);
   box.querySelector('textarea').focus();
-
   if (wrap) wrap.style.maxHeight = wrap.scrollHeight + 200 + 'px';
 }
 
 async function sendReply(btn, parentId) {
-  const ta   = btn.closest('.reply-input-box').querySelector('textarea');
+  const ta = btn.closest('.reply-input-box').querySelector('textarea');
   const body = ta.value.trim();
   if (!body) return;
-  const isAnon = document.getElementById('anon-check').checked;
-  await db.from('messages').insert({
+  btn.disabled = true;
+  const { error } = await db.from('messages').insert({
     case_id:      currentCase.id,
     parent_id:    parentId,
     display_name: currentUser.display_name,
     role:         currentUser.role,
-    body,
-    tag:          null,
-    is_anonymous: isAnon
+    body, tag: null,
+    is_anonymous: document.getElementById('anon-check').checked
   });
-  btn.closest('.reply-input-box').remove();
-  await loadMessages();
+  if (!error) btn.closest('.reply-input-box').remove();
+  else { btn.disabled = false; alert('送信に失敗しました'); }
 }
 
-/* ==================================================
-   新規メッセージ送信
-================================================== */
+/* ================================================
+   メッセージ送信
+================================================ */
 function selectTag(btn) {
   document.querySelectorAll('.tag-sel-btn').forEach(b => b.className = 'tag-sel-btn');
   currentTag = btn.dataset.tag;
-  const cls = { '良かった点': 'sel-good', '改善点': 'sel-imp', '質問': 'sel-q' }[currentTag] || '';
+  const cls = { '良かった点':'sel-good', '改善点':'sel-imp', '質問':'sel-q' }[currentTag]||'';
   if (cls) btn.classList.add(cls);
 }
 
@@ -1187,49 +735,57 @@ async function sendMessage() {
   const ta   = document.getElementById('msg-input');
   const body = ta.value.trim();
   if (!body || !currentCase) return;
-  const isAnon = document.getElementById('anon-check').checked;
-  await db.from('messages').insert({
+  const sendBtn = document.getElementById('send-btn');
+  sendBtn.disabled = true;
+  const { error } = await db.from('messages').insert({
     case_id:      currentCase.id,
     parent_id:    null,
     display_name: currentUser.display_name,
     role:         currentUser.role,
     body,
     tag:          currentTag === 'なし' ? null : currentTag,
-    is_anonymous: isAnon
+    is_anonymous: document.getElementById('anon-check').checked
   });
-  ta.value = '';
-  await loadMessages();
+  sendBtn.disabled = false;
+  if (!error) ta.value = '';
+  else alert('送信に失敗しました');
 }
 
-/* ==================================================
+/* ================================================
    タグフィルター
-================================================== */
+================================================ */
 function filterTag(btn) {
   filterTagVal = btn.dataset.tag;
   document.querySelectorAll('.tag-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
   loadMessages();
 }
 
-/* ==================================================
-   Realtime購読
-================================================== */
+/* ================================================
+   Realtime — INSERTとDELETEを購読して全員更新
+================================================ */
 function subscribeRealtime() {
-  if (realtimeChannel) db.removeChannel(realtimeChannel);
-  realtimeChannel = db.channel('messages-' + currentCase.id)
-    .on('postgres_changes', {
-      event: '*', schema: 'public', table: 'messages',
-      filter: `case_id=eq.${currentCase.id}`
-    }, () => loadMessages())
-    .subscribe();
+  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+
+  realtimeChannel = db
+    .channel('room-' + currentCase.id)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
+      () => loadMessages()
+    )
+    .on('postgres_changes',
+      { event: 'DELETE', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
+      () => loadMessages()
+    )
+    .subscribe(status => {
+      // 接続失敗時は3秒後に再試行
+      if (status === 'CHANNEL_ERROR') setTimeout(() => subscribeRealtime(), 3000);
+    });
 }
 
-/* ==================================================
+/* ================================================
    管理者画面
-================================================== */
-async function goAdmin() {
-  showScreen('admin');
-  await loadAdminMembers();
-}
+================================================ */
+async function goAdmin() { showScreen('admin'); await loadAdminMembers(); }
 function goChat() { showScreen('chat'); }
 
 async function loadAdminMembers() {
@@ -1238,7 +794,7 @@ async function loadAdminMembers() {
   tbody.innerHTML = '';
   (data || []).forEach(m => {
     const tr = document.createElement('tr');
-    const pillCls = { '隊長': 'role-leader', '救命士': 'role-qs' }[m.role] || 'role-member';
+    const pillCls = { '隊長':'role-leader', '救命士':'role-qs' }[m.role] || 'role-member';
     tr.innerHTML = `
       <td>${esc(m.display_name)}</td>
       <td><span class="role-pill ${pillCls}">${esc(m.role)}</span></td>
@@ -1251,10 +807,12 @@ async function addMember() {
   const name = document.getElementById('new-member-name').value.trim();
   const role = document.getElementById('new-member-role').value;
   if (!name) return;
-  await db.from('members').insert({ display_name: name, role });
-  document.getElementById('new-member-name').value = '';
-  showSuccess('member-success');
-  await loadAdminMembers();
+  const { error } = await db.from('members').insert({ display_name: name, role });
+  if (!error) {
+    document.getElementById('new-member-name').value = '';
+    showSuccess('member-success');
+    await loadAdminMembers();
+  }
 }
 
 async function deleteMember(id, name) {
@@ -1271,28 +829,24 @@ async function updatePassphrase(key, inputId) {
   showSuccess('pw-success');
 }
 
-/* ==================================================
+/* ================================================
    ユーティリティ
-================================================== */
+================================================ */
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
 }
-
 function tagClass(tag) {
-  return { '良かった点': 'tag-good', '改善点': 'tag-imp', '質問': 'tag-q' }[tag] || '';
+  return { '良かった点':'tag-good', '改善点':'tag-imp', '質問':'tag-q' }[tag] || '';
 }
-
 function formatTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-
 function esc(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function showSuccess(id) {
   const el = document.getElementById(id);
   el.style.display = 'block';
