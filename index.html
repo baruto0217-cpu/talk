@@ -464,7 +464,7 @@ async function enterChat() {
 async function startChat() {
   showScreen('chat');
   document.getElementById('sidebar-username').textContent =
-    `${currentUser.display_name}（${currentUser.role}）`;
+    currentUser.is_admin ? '管理者' : `${currentUser.display_name}（${currentUser.role}）`;
   document.getElementById('admin-btn').style.display = currentUser.is_admin ? '' : 'none';
   await loadCases();
 }
@@ -702,8 +702,8 @@ async function sendReply(btn, parentId) {
   const { error } = await db.from('messages').insert({
     case_id:      currentCase.id,
     parent_id:    parentId,
-    display_name: currentUser.display_name,
-    role:         currentUser.role,
+    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
+    role:         currentUser.is_admin ? '管理者' : currentUser.role,
     body, tag: null,
     is_anonymous: document.getElementById('anon-check').checked
   });
@@ -730,8 +730,8 @@ async function sendMessage() {
   const { error } = await db.from('messages').insert({
     case_id:      currentCase.id,
     parent_id:    null,
-    display_name: currentUser.display_name,
-    role:         currentUser.role,
+    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
+    role:         currentUser.is_admin ? '管理者' : currentUser.role,
     body,
     tag:          currentTag === 'なし' ? null : currentTag,
     is_anonymous: document.getElementById('anon-check').checked
