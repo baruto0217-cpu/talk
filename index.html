@@ -136,8 +136,12 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .tag-sel-btn.sel-good{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);font-weight:600}
 .tag-sel-btn.sel-imp{background:var(--coral-bg);border-color:var(--coral-bd);color:var(--coral);font-weight:600}
 .tag-sel-btn.sel-q{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);font-weight:600}
-.anon-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500}
-.anon-label input[type=checkbox]{width:20px;height:20px;cursor:pointer;accent-color:var(--teal);flex-shrink:0}
+.anon-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500;user-select:none}
+.anon-label input[type=checkbox]{display:none}
+.anon-check-box{width:22px;height:22px;border-radius:5px;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.anon-label input[type=checkbox]:checked + .anon-check-box{background:var(--teal);border-color:var(--teal)}
+.anon-check-mark{width:13px;height:13px;display:none}
+.anon-label input[type=checkbox]:checked + .anon-check-box .anon-check-mark{display:block}
 .input-row{display:flex;gap:8px;align-items:flex-end}
 .msg-ta{flex:1;resize:none;height:54px;font-size:15px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
 .msg-ta:focus{outline:none;border-color:var(--teal)}
@@ -275,7 +279,15 @@ textarea,input{-webkit-appearance:none;appearance:none}
           <button class="tag-sel-btn" data-tag="質問" onclick="selectTag(this)">質問</button>
           <button class="tag-sel-btn" data-tag="なし" onclick="selectTag(this)">なし</button>
         </div>
-        <label class="anon-label" style="margin-left:0;flex-shrink:0;flex-direction:row;"><input type="checkbox" id="anon-check"><span>匿名</span></label>
+        <label class="anon-label" style="margin-left:0;">
+          <input type="checkbox" id="anon-check">
+          <div class="anon-check-box">
+            <svg class="anon-check-mark" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 6.5L5.5 10L11 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span>匿名</span>
+        </label>
       </div>
       <div class="input-row">
         <textarea class="msg-ta" id="msg-input" placeholder="振り返りを入力..."></textarea>
