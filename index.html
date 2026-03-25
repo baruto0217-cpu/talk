@@ -82,6 +82,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .mobile-header{height:52px;background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
 .mobile-header-title{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hamburger-btn{width:40px;height:40px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+#realtime-indicator{width:8px;height:8px;border-radius:50%;background:#9a9a94;flex-shrink:0;transition:background .4s;}
 
 .case-header{padding:10px 14px;border-bottom:0.5px solid var(--border);background:var(--surface);display:none}
 .case-header.visible{display:block}
@@ -108,6 +109,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .msg-actions{margin-left:35px;margin-top:3px;display:flex;align-items:center;gap:10px}
 .act-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:4px 0;display:flex;align-items:center;gap:3px;min-height:28px}
 .act-btn:active{color:var(--text2)}
+.del-msg-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:4px 0;min-height:28px;margin-left:auto;transition:color .12s;}
+.del-msg-btn:active{color:var(--red);}
 
 .replies-wrap{overflow:hidden;transition:max-height .25s ease,opacity .2s ease}
 .replies-wrap.collapsed{max-height:0!important;opacity:0}
@@ -256,6 +259,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <div class="mobile-header">
       <button class="hamburger-btn" onclick="openSidebar()">☰</button>
       <div class="mobile-header-title" id="mobile-header-title">症例を選択してください</div>
+      <div id="realtime-indicator" title="接続確認中"></div>
     </div>
     <div class="case-header" id="case-header">
       <div class="case-header-title" id="case-header-title"></div>
@@ -365,8 +369,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
 /* ================================================
    設定（自分のSupabase情報に書き換えてください）
 ================================================ */
-const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+const SUPABASE_URL      = 'https://xxxxxxxxxxxxxxxxxxxx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.XXXX';
 
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
@@ -379,6 +383,8 @@ let currentCase     = null;
 let currentTag      = 'なし';
 let filterTagVal    = 'all';
 let realtimeChannel = null;
+let pollingTimer     = null;
+let realtimeOk       = false;
 
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('kyukyu_user');
@@ -484,7 +490,7 @@ async function startChat() {
 function logout() {
   localStorage.removeItem('kyukyu_user');
   currentUser = null; currentCase = null;
-  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+  stopRealtime();
   document.getElementById('pw-input').value = '';
   document.getElementById('step1').classList.remove('hidden');
   document.getElementById('step2').classList.add('hidden');
@@ -532,7 +538,7 @@ async function deleteCase(event, caseId, caseTitle) {
   if (error) { alert('削除に失敗しました'); return; }
   if (currentCase && currentCase.id === caseId) {
     currentCase = null;
-    if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+    stopRealtime();
     document.getElementById('case-header').classList.remove('visible');
     document.getElementById('input-area').style.display = 'none';
     document.getElementById('mobile-header-title').textContent = '症例を選択してください';
@@ -627,12 +633,20 @@ function buildMsgEl(msg, replies) {
       <span id="ri-${msg.id}">▼</span>
       <span id="rl-${msg.id}">リプライ ${replies.length}件を非表示</span>
     </button>` : '';
+  const canDelete = currentUser && (
+    currentUser.is_admin ||
+    (!msg.is_anonymous && msg.display_name === currentUser.display_name)
+  );
+  const delMsgHTML = canDelete
+    ? `<button class="del-msg-btn" onclick="deleteMessage('${msg.id}', false)" title="削除">✕</button>` : '';
+
   div.innerHTML = `
     <div class="msg-header">
       <div class="avatar">${initial}</div>
       <span class="msg-name">${name}</span>
       <span class="msg-time">${formatTime(msg.created_at)}</span>
       ${tagHTML}
+      ${delMsgHTML}
     </div>
     <div class="msg-body">${esc(msg.body)}</div>
     <div class="msg-actions">
@@ -645,12 +659,19 @@ function buildMsgEl(msg, replies) {
 
 function buildReplyHTML(r) {
   const name = r.is_anonymous ? '匿名' : esc(r.display_name);
+  const canDel = currentUser && (
+    currentUser.is_admin ||
+    (!r.is_anonymous && r.display_name === currentUser.display_name)
+  );
+  const delBtn = canDel
+    ? `<button class="del-msg-btn" onclick="deleteMessage('${r.id}', true)" title="削除">✕</button>` : '';
   return `
     <div class="reply" data-id="${r.id}">
       <div class="reply-header">
         <div class="reply-avatar">${name.charAt(0)}</div>
         <span class="reply-name">${name}</span>
         <span class="reply-time">${formatTime(r.created_at)}</span>
+        ${delBtn}
       </div>
       <div class="reply-body">${esc(r.body)}</div>
     </div>`;
@@ -766,22 +787,61 @@ function filterTag(btn) {
    Realtime — INSERTとDELETEを購読して全員更新
 ================================================ */
 function subscribeRealtime() {
-  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+  // 既存チャンネルとポーリングをリセット
+  stopRealtime();
+  if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
+  realtimeOk = false;
+  updateRealtimeIndicator();
 
+  // Realtime 購読
   realtimeChannel = db
     .channel('room-' + currentCase.id)
     .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
-      () => loadMessages()
+      () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
     )
     .on('postgres_changes',
       { event: 'DELETE', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
-      () => loadMessages()
+      () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
     )
     .subscribe(status => {
-      // 接続失敗時は3秒後に再試行
-      if (status === 'CHANNEL_ERROR') setTimeout(() => subscribeRealtime(), 3000);
+      if (status === 'SUBSCRIBED') {
+        realtimeOk = true;
+        updateRealtimeIndicator();
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        realtimeOk = false;
+        updateRealtimeIndicator();
+        // Realtime 失敗時は5秒後に再試行
+        setTimeout(() => { if (currentCase) subscribeRealtime(); }, 5000);
+      }
     });
+
+  // ポーリング（5秒ごと）— Realtime の補完
+  pollingTimer = setInterval(() => {
+    if (currentCase) loadMessages();
+  }, 5000);
+}
+
+function updateRealtimeIndicator() {
+  const el = document.getElementById('realtime-indicator');
+  if (!el) return;
+  el.title      = realtimeOk ? 'リアルタイム接続中' : 'ポーリングで更新中';
+  el.style.background = realtimeOk ? '#1D9E75' : '#EF9F27';
+}
+
+async function deleteMessage(msgId, isReply) {
+  if (!confirm(isReply ? 'このリプライを削除しますか？' : 'このメッセージを削除しますか？
+リプライもすべて削除されます。')) return;
+  const { error } = await db.from('messages').delete().eq('id', msgId);
+  if (error) alert('削除に失敗しました。RLSの設定を確認してください。');
+  else await loadMessages();
+}
+
+function stopRealtime() {
+  stopRealtime();
+  if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
+  realtimeOk = false;
+  updateRealtimeIndicator();
 }
 
 /* ================================================
