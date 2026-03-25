@@ -852,7 +852,7 @@ async function deleteMessage(msgId, isReply) {
 }
 
 function stopRealtime() {
-  stopRealtime();
+  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
   if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
   realtimeOk = false;
   updateRealtimeIndicator();
