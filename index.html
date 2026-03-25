@@ -417,9 +417,23 @@ async function submitPassphrase() {
   const errEl = document.getElementById('pw-error');
   errEl.style.display = 'none';
 
+  // ボタンをローディング状態に
+  const btn = document.querySelector('#step1 .btn-primary');
+  btn.disabled = true;
+  btn.textContent = '確認中...';
+
   const { data, error } = await db.from('settings').select('key,value');
-  if (error || !data) {
-    errEl.textContent = 'サーバーに接続できません';
+
+  btn.disabled = false;
+  btn.textContent = '次へ';
+
+  if (error) {
+    errEl.textContent = 'エラー: ' + (error.message || 'サーバーに接続できません');
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!data || data.length === 0) {
+    errEl.textContent = 'settings テーブルが空です。Supabaseにデータを登録してください。';
     errEl.style.display = 'block';
     return;
   }
@@ -830,8 +844,8 @@ function updateRealtimeIndicator() {
 }
 
 async function deleteMessage(msgId, isReply) {
-  if (!confirm(isReply ? 'このリプライを削除しますか？' : 'このメッセージを削除しますか？
-リプライもすべて削除されます。')) return;
+  const msg = isReply ? 'このリプライを削除しますか?' : 'このメッセージを削除しますか?\nリプライもすべて削除されます。';
+  if (!confirm(msg)) return;
   const { error } = await db.from('messages').delete().eq('id', msgId);
   if (error) alert('削除に失敗しました。RLSの設定を確認してください。');
   else await loadMessages();
@@ -885,7 +899,7 @@ async function addMember() {
 }
 
 async function deleteMember(id, name) {
-  if (!confirm(`「${name}」を削除しますか？`)) return;
+  if (!confirm(`${name}を削除しますか?`)) return;
   const { error } = await db.from('members').delete().eq('id', id);
   if (!error) await loadAdminMembers();
   else alert('削除に失敗しました。RLSの設定を確認してください。');
