@@ -347,14 +347,21 @@ textarea,input{-webkit-appearance:none;appearance:none}
       <div class="case-header-sub" id="case-header-sub"></div>
       <div class="slide-ctrl" id="slide-ctrl">
         <span class="slide-ctrl-label">スライド</span>
-        <button class="slide-ctrl-btn" onclick="changeSlide(-1)">−</button>
-        <span class="slide-ctrl-num" id="slide-current">1</span>
-        <span class="slide-ctrl-total" id="slide-total">/ 1</span>
-        <button class="slide-ctrl-btn" onclick="changeSlide(1)">＋</button>
-        <span style="font-size:11px;color:var(--text3);margin-left:4px;">枚設定:</span>
-        <input type="number" id="slide-total-input" min="1" max="99" value="1"
-          style="width:44px;font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;"
-          onchange="setTotalSlides(this.value)">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--text2);">
+          <input type="checkbox" id="slide-enabled-chk" onchange="toggleSlideEnabled(this.checked)"
+            style="width:15px;height:15px;accent-color:var(--teal);cursor:pointer;">
+          使用する
+        </label>
+        <div id="slide-controls-inner" style="display:none;align-items:center;gap:6px;flex-wrap:nowrap;">
+          <button class="slide-ctrl-btn" onclick="changeSlide(-1)">−</button>
+          <span class="slide-ctrl-num" id="slide-current">1</span>
+          <span class="slide-ctrl-total" id="slide-total">/ 1</span>
+          <button class="slide-ctrl-btn" onclick="changeSlide(1)">＋</button>
+          <span style="font-size:11px;color:var(--text3);">枚設定:</span>
+          <input type="number" id="slide-total-input" min="1" max="99" value="1"
+            style="width:44px;font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;"
+            onchange="setTotalSlides(this.value)">
+        </div>
       </div>
       <div class="tag-filters">
         <button class="tag-filter-btn active" data-tag="all" onclick="filterTag(this)">すべて</button>
@@ -500,8 +507,15 @@ textarea,input{-webkit-appearance:none;appearance:none}
         </div>
       </div>
       <div id="case-slides-field" style="display:none;">
-        <div class="field-label">スライド総枚数</div>
-        <input class="field-input" type="number" id="case-total-slides-input" min="1" max="99" value="10" style="font-size:14px;padding:10px;">
+        <div class="field-label">スライド機能</div>
+        <label style="display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;font-size:13px;">
+          <input type="checkbox" id="case-slide-enabled" onchange="document.getElementById('case-slide-total-wrap').style.display=this.checked?'':'none'" style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer;">
+          スライド番号を使用する
+        </label>
+        <div id="case-slide-total-wrap" style="display:none;">
+          <div class="field-label" style="margin-top:4px;">スライド総枚数</div>
+          <input class="field-input" type="number" id="case-total-slides-input" min="1" max="99" value="10" style="font-size:14px;padding:10px;">
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -904,11 +918,14 @@ async function selectCase(c) {
   const slideCtrl = document.getElementById('slide-ctrl');
   if (currentUser && currentUser.is_admin) {
     slideCtrl.classList.add('visible');
-    const cur = c.current_slide || 1;
-    const tot = c.total_slides  || 1;
-    document.getElementById('slide-current').textContent    = cur;
-    document.getElementById('slide-total').textContent      = '/ ' + tot;
-    document.getElementById('slide-total-input').value      = tot;
+    const cur     = c.current_slide || 1;
+    const tot     = c.total_slides  || 1;
+    const enabled = !!c.slide_enabled;
+    document.getElementById('slide-current').textContent = cur;
+    document.getElementById('slide-total').textContent   = '/ ' + tot;
+    document.getElementById('slide-total-input').value   = tot;
+    document.getElementById('slide-enabled-chk').checked = enabled;
+    document.getElementById('slide-controls-inner').style.display = enabled ? 'flex' : 'none';
   } else {
     slideCtrl.classList.remove('visible');
   }
@@ -930,6 +947,11 @@ function openNewCaseModal() {
   // スライド枚数入力は管理者なら常に表示
   const slidesField = document.getElementById('case-slides-field');
   if (slidesField) slidesField.style.display = currentUser && currentUser.is_admin ? '' : 'none';
+  // スライドON/OFFをデフォルトOFFにリセット
+  const slideEnabledChk = document.getElementById('case-slide-enabled');
+  if (slideEnabledChk) slideEnabledChk.checked = false;
+  const slideTotalWrap = document.getElementById('case-slide-total-wrap');
+  if (slideTotalWrap) slideTotalWrap.style.display = 'none';
   // デフォルトを掲示板に戻す
   document.querySelector('input[name="case-mode"][value="public"]').checked = true;
   document.getElementById('modal-new-case').classList.add('active');
@@ -945,12 +967,15 @@ async function createCase() {
   if (!title) return;
   const modeEl = document.querySelector('input[name="case-mode"]:checked');
   const mode = (currentUser && currentUser.is_admin && modeEl) ? modeEl.value : 'public';
-  const totalSl = parseInt(document.getElementById('case-total-slides-input')?.value)||1;
+  const slideEnabledEl = document.getElementById('case-slide-enabled');
+  const slideEnabled   = slideEnabledEl ? slideEnabledEl.checked : false;
+  const totalSl = slideEnabled ? (parseInt(document.getElementById('case-total-slides-input')?.value)||1) : 1;
   const { data, error } = await db.from('cases').insert({
     title, occurred_at: date || null,
     patient_summary: summary || null,
     created_by: currentUser.display_name,
     mode,
+    slide_enabled: slideEnabled,
     current_slide: 1,
     total_slides: totalSl
   }).select().single();
@@ -1150,7 +1175,7 @@ async function sendMessage() {
     body,
     tag:          currentTag === 'なし' ? null : currentTag,
     is_anonymous: document.getElementById('anon-check').checked,
-    slide_no:     currentCase && currentCase.mode === 'private' ? (currentCase.current_slide || 1) : null
+    slide_no:     currentCase && currentCase.slide_enabled ? (currentCase.current_slide || 1) : null
   });
   sendBtn.disabled = false;
   if (!error) ta.value = '';
@@ -1402,6 +1427,15 @@ function downloadQR() {
     link.href = img.src;
   }
   link.click();
+}
+
+async function toggleSlideEnabled(enabled) {
+  if (!currentCase || !currentUser || !currentUser.is_admin) return;
+  const inner = document.getElementById('slide-controls-inner');
+  if (inner) inner.style.display = enabled ? 'flex' : 'none';
+  const { error } = await db.from('cases').update({ slide_enabled: enabled }).eq('id', currentCase.id);
+  if (error) alert('更新に失敗しました');
+  else currentCase.slide_enabled = enabled;
 }
 
 async function changeSlide(delta) {
