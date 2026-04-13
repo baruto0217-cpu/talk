@@ -73,6 +73,14 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .case-del-btn{flex-shrink:0;font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
 .case-item:hover .case-del-btn,.case-item.active .case-del-btn{opacity:1}
 .case-del-btn:active{color:var(--red)}
+.case-lock-btn,.case-hide-btn{flex-shrink:0;font-size:10px;color:var(--text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s;cursor:pointer;}
+.case-item:hover .case-lock-btn,.case-item.active .case-lock-btn,.case-item:hover .case-hide-btn,.case-item.active .case-hide-btn{opacity:1}
+.case-lock-btn.on{color:var(--amber);opacity:1}
+.case-hide-btn.on{color:var(--red);opacity:1}
+.case-item.locked .case-item-title{color:var(--text3)}
+.case-item.hidden-case{opacity:.5}
+.case-locked-badge{font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
+.case-hidden-badge{font-size:9px;font-weight:700;color:var(--red);background:var(--red-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
 .sidebar-footer{padding:8px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:5px}
 .sidebar-btn{width:100%;padding:12px;font-size:13px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text2);text-align:left;transition:background .12s;min-height:44px}
 .sidebar-btn:active{background:var(--surface2)}
@@ -745,30 +753,66 @@ async function loadCases() {
     return;
   }
   data.forEach(c => {
-    // 非公開症例も一覧には表示（コメントは自分のものだけ見える）
+    const isAdmin = currentUser && currentUser.is_admin;
+    // 非表示症例：管理者以外には見せない
+    if (c.is_hidden && !isAdmin) return;
+
     const el = document.createElement('div');
     el.className  = 'case-item';
     el.dataset.id = c.id;
-    const delBtn = currentUser && currentUser.is_admin
-      ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>`
-      : '';
-    const qrBtn = currentUser && currentUser.is_admin
-      ? `<button class="qr-btn" onclick="showQR(event,'${c.id}','${esc(c.title)}')" title="QRコード">QR</button>`
-      : '';
+    if (c.is_locked) el.classList.add('locked');
+    if (c.is_hidden) el.classList.add('hidden-case');
+
+    const delBtn = isAdmin
+      ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>` : '';
+    const qrBtn = isAdmin
+      ? `<button class="qr-btn" onclick="showQR(event,'${c.id}','${esc(c.title)}')" title="QRコード">QR</button>` : '';
+    const lockBtn = isAdmin
+      ? `<button class="case-lock-btn ${c.is_locked ? 'on' : ''}" onclick="toggleCaseLock(event,'${c.id}',${!!c.is_locked})" title="${c.is_locked ? 'ロック解除' : 'ロック'}">🔒</button>` : '';
+    const hideBtn = isAdmin
+      ? `<button class="case-hide-btn ${c.is_hidden ? 'on' : ''}" onclick="toggleCaseHide(event,'${c.id}',${!!c.is_hidden})" title="${c.is_hidden ? '表示に戻す' : '非表示にする'}">👁</button>` : '';
     const privateBadge = c.mode === 'private'
-      ? `<span class="case-item-private">${currentUser && currentUser.is_admin ? '非公開' : '閲覧制限'}</span>` : '';
+      ? `<span class="case-item-private">${isAdmin ? '非公開' : '閲覧制限'}</span>` : '';
+    const lockedBadge = c.is_locked && !isAdmin
+      ? `<span class="case-locked-badge">🔒</span>` : '';
+    const hiddenBadge = c.is_hidden && isAdmin
+      ? `<span class="case-hidden-badge">非表示</span>` : '';
+
     el.innerHTML  = `
       <div class="case-item-row">
         <div class="case-item-title" style="flex:1;min-width:0;">${esc(c.title)}</div>
-        ${privateBadge}
-        ${qrBtn}
-        ${delBtn}
+        ${privateBadge}${lockedBadge}${hiddenBadge}
+        ${lockBtn}${hideBtn}${qrBtn}${delBtn}
       </div>
       <div class="case-item-meta">${c.occurred_at||''}</div>`;
-    el.onclick    = () => { selectCase(c); closeSidebar(); };
+
+    el.onclick = () => {
+      if (c.is_locked && !isAdmin) {
+        alert('この症例はロックされています');
+        return;
+      }
+      selectCase(c);
+      closeSidebar();
+    };
     list.appendChild(el);
     if (currentCase && currentCase.id === c.id) el.classList.add('active');
   });
+}
+
+async function toggleCaseLock(event, caseId, currentLocked) {
+  event.stopPropagation();
+  const { error } = await db.from('cases').update({ is_locked: !currentLocked }).eq('id', caseId);
+  if (error) { alert('更新に失敗しました'); return; }
+  await loadCases();
+}
+
+async function toggleCaseHide(event, caseId, currentHidden) {
+  event.stopPropagation();
+  const label = currentHidden ? 'この症例を表示に戻しますか?' : 'この症例を非表示にしますか?\n参加者の一覧から消えます。';
+  if (!confirm(label)) return;
+  const { error } = await db.from('cases').update({ is_hidden: !currentHidden }).eq('id', caseId);
+  if (error) { alert('更新に失敗しました'); return; }
+  await loadCases();
 }
 
 async function deleteCase(event, caseId, caseTitle) {
