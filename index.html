@@ -720,6 +720,16 @@ async function startChat() {
     currentUser.is_admin ? '管理者' : `${currentUser.display_name}（${currentUser.role}）`;
   document.getElementById('admin-btn').style.display = currentUser.is_admin ? '' : 'none';
   await loadCases();
+  // cases全体の変更を購読（ロック・非表示のリアルタイム反映用）
+  // subscribeRealtimeとは別チャンネルとして一度だけ登録
+  if (!window._casesChannel) {
+    window._casesChannel = db.channel('cases-global')
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'cases' },
+        async () => { await loadCases(); }
+      )
+      .subscribe();
+  }
   // URLから指定された症例を自動で開く
   const pendingId = sessionStorage.getItem('pending_case_id');
   if (pendingId) {
@@ -733,6 +743,10 @@ function logout() {
   localStorage.removeItem('kyukyu_user');
   currentUser = null; currentCase = null;
   stopRealtime();
+  if (window._casesChannel) {
+    db.removeChannel(window._casesChannel);
+    window._casesChannel = null;
+  }
   document.getElementById('login-name').value = '';
   document.getElementById('login-pw').value = '';
   document.getElementById('login-error').style.display = 'none';
@@ -1219,14 +1233,6 @@ function subscribeRealtime() {
       }
     });
 
-  // cases全体の変更を購読（ロック・非表示のリアルタイム反映用）
-  db.channel('cases-changes')
-    .on('postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'cases' },
-      async () => { await loadCases(); }
-    )
-    .subscribe();
-
   // ポーリング（5秒ごと）— Realtime の補完
   pollingTimer = setInterval(() => {
     if (currentCase) loadMessages();
@@ -1549,7 +1555,7 @@ async function deleteQuiz(quizId) {
 async function loadActiveQuiz() {
   if (!currentCase) return;
   const { data } = await db.from('quizzes')
-    .select('*').eq('case_id', currentCase.id).eq('status', 'active').single();
+    .select('*').eq('case_id', currentCase.id).eq('status', 'active').maybeSingle();
   if (data) showQuizBanner(data);
   else hideQuizBanner();
 }
