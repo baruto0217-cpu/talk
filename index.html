@@ -345,6 +345,17 @@ textarea,input{-webkit-appearance:none;appearance:none}
       </table>
     </div>
     <div class="admin-card">
+      <div class="admin-card-title">招待コード管理</div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.6;">新規登録時に必要なコードを発行します。1つのコードを複数人で使えます。</p>
+      <div style="display:flex;gap:6px;">
+        <input class="field-input" type="text" id="new-invite-code" placeholder="例：AICHI-001" style="font-size:13px;padding:9px 10px;">
+        <button class="admin-add-btn" style="width:auto;padding:9px 14px;white-space:nowrap;" onclick="addInviteCode()">発行</button>
+      </div>
+      <div id="invite-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
+      <div class="success-msg" id="invite-success">発行しました</div>
+    </div>
+
+    <div class="admin-card">
       <div class="admin-card-title">隊員を追加</div>
       <div class="admin-field">
         <label>氏名</label>
@@ -420,7 +431,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') doRegister();
   });
   document.getElementById('msg-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); }
   });
 });
 
@@ -937,7 +948,7 @@ function stopRealtime() {
 /* ================================================
    管理者画面
 ================================================ */
-async function goAdmin() { showScreen('admin'); await loadAdminMembers(); }
+async function goAdmin() { showScreen('admin'); await loadAdminMembers(); await loadInviteCodes(); }
 function goChat() { showScreen('chat'); }
 
 async function loadAdminMembers() {
@@ -992,8 +1003,54 @@ async function addMember() {
 async function deleteMember(id, name) {
   if (!confirm(`${name}を削除しますか?`)) return;
   const { error } = await db.from('members').delete().eq('id', id);
-  if (!error) await loadAdminMembers();
-  else alert('削除に失敗しました。RLSの設定を確認してください。');
+  if (!error) {
+    await loadAdminMembers();
+  } else {
+    const msg = error.message && error.message.includes('row-level security')
+      ? '削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists "members_delete" on members;\ncreate policy "members_delete" on members for delete using (true);'
+      : '削除に失敗しました: ' + (error.message || '');
+    alert(msg);
+  }
+}
+
+async function loadInviteCodes() {
+  const { data } = await db.from('invite_codes').select('*').order('created_at', { ascending: false });
+  const list = document.getElementById('invite-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);">招待コードがありません</div>';
+    return;
+  }
+  data.forEach(inv => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:var(--radius-sm);border:0.5px solid var(--border);';
+    row.innerHTML = `
+      <span style="flex:1;font-size:13px;font-weight:600;font-family:monospace;color:var(--text);">${esc(inv.code)}</span>
+      <button onclick="deleteInviteCode('${inv.id}','${esc(inv.code)}')" style="font-size:11px;color:var(--red);background:none;border:none;padding:2px 4px;cursor:pointer;">削除</button>`;
+    list.appendChild(row);
+  });
+}
+
+async function addInviteCode() {
+  const input = document.getElementById('new-invite-code');
+  const code  = input.value.trim().toUpperCase();
+  if (!code) return;
+  const { error } = await db.from('invite_codes').insert({ code });
+  if (!error) {
+    input.value = '';
+    showSuccess('invite-success');
+    await loadInviteCodes();
+  } else {
+    alert('発行に失敗しました: ' + (error.message || ''));
+  }
+}
+
+async function deleteInviteCode(id, code) {
+  if (!confirm(`招待コード「${code}」を削除しますか?`)) return;
+  const { error } = await db.from('invite_codes').delete().eq('id', id);
+  if (!error) await loadInviteCodes();
+  else alert('削除に失敗しました');
 }
 
 
