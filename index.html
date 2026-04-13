@@ -860,7 +860,9 @@ async function selectCase(c) {
   } else {
     slideCtrl.classList.remove('visible');
   }
-  document.getElementById('input-area').style.display = '';
+  // ロック中は参加者の投稿エリアを非表示
+  const isLocked = c.is_locked && !(currentUser && currentUser.is_admin);
+  document.getElementById('input-area').style.display = isLocked ? 'none' : '';
   filterTagVal = 'all';
   document.querySelectorAll('.tag-filter-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tag === 'all'));
@@ -1155,18 +1157,54 @@ function subscribeRealtime() {
     )
     .on('postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'cases', filter: `id=eq.${currentCase.id}` },
-      payload => {
+      async payload => {
         realtimeOk = true; updateRealtimeIndicator();
-        if (payload.new) {
-          currentCase.current_slide = payload.new.current_slide;
-          currentCase.total_slides  = payload.new.total_slides;
-          const cur = payload.new.current_slide || 1;
-          const tot = payload.new.total_slides  || 1;
-          const el = document.getElementById('slide-current');
-          const tl = document.getElementById('slide-total');
-          if (el) el.textContent = cur;
-          if (tl) tl.textContent = '/ ' + tot;
+        if (!payload.new) return;
+        const n = payload.new;
+
+        // スライド番号更新
+        currentCase.current_slide = n.current_slide;
+        currentCase.total_slides  = n.total_slides;
+        const el = document.getElementById('slide-current');
+        const tl = document.getElementById('slide-total');
+        if (el) el.textContent = n.current_slide || 1;
+        if (tl) tl.textContent = '/ ' + (n.total_slides || 1);
+
+        // ロック・非表示の変更
+        const wasLocked = currentCase.is_locked;
+        const wasHidden = currentCase.is_hidden;
+        currentCase.is_locked = n.is_locked;
+        currentCase.is_hidden  = n.is_hidden;
+
+        // 参加者に対してロック・非表示が変わった場合の処理
+        if (!currentUser.is_admin) {
+          // 非表示になった → チャットを閉じる
+          if (n.is_hidden && !wasHidden) {
+            currentCase = null;
+            stopRealtime();
+            document.getElementById('case-header').classList.remove('visible');
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('mobile-header-title').textContent = '症例を選択してください';
+            document.getElementById('messages').innerHTML =
+              '<div class="no-case">この症例は現在非表示になりました</div>';
+            await loadCases();
+            return;
+          }
+          // ロックされた → 投稿エリアを無効化
+          if (n.is_locked && !wasLocked) {
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('messages').insertAdjacentHTML('afterbegin',
+              '<div style="font-size:12px;color:var(--amber);background:var(--amber-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:8px;border:0.5px solid #fac775;">この症例はロックされました</div>');
+          }
+          // ロック解除 → 投稿エリアを再表示
+          if (!n.is_locked && wasLocked) {
+            document.getElementById('input-area').style.display = '';
+            const notice = document.querySelector('.lock-notice');
+            if (notice) notice.remove();
+          }
         }
+        // 症例一覧を更新
+        await loadCases();
       }
     )
     .subscribe(status => {
@@ -1180,6 +1218,14 @@ function subscribeRealtime() {
         setTimeout(() => { if (currentCase) subscribeRealtime(); }, 5000);
       }
     });
+
+  // cases全体の変更を購読（ロック・非表示のリアルタイム反映用）
+  db.channel('cases-changes')
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'cases' },
+      async () => { await loadCases(); }
+    )
+    .subscribe();
 
   // ポーリング（5秒ごと）— Realtime の補完
   pollingTimer = setInterval(() => {
