@@ -340,7 +340,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <div class="admin-panel">
       <div class="admin-panel-header">登録隊員一覧</div>
       <table class="member-table">
-        <thead><tr><th>氏名</th><th>役職</th><th></th></tr></thead>
+        <thead><tr><th>氏名</th><th>役職</th><th style="width:50px;"></th></tr></thead>
         <tbody id="admin-member-tbody"></tbody>
       </table>
     </div>
@@ -396,6 +396,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -953,13 +954,28 @@ async function loadAdminMembers() {
   }
   data.forEach(m => {
     const tr = document.createElement('tr');
-    const pillCls = { '管理者':'role-admin', '隊長':'role-leader', '救命士':'role-qs' }[m.role] || 'role-member';
+    const roles = ['管理者','隊長','救命士','隊員'];
+    const opts = roles.map(r =>
+      `<option value="${r}" ${m.role === r ? 'selected' : ''}>${r}</option>`
+    ).join('');
     tr.innerHTML = `
-      <td>${esc(m.display_name)}</td>
-      <td><span class="role-pill ${pillCls}">${esc(m.role)}</span></td>
+      <td style="font-size:13px;">${esc(m.display_name)}</td>
+      <td>
+        <select class="role-select" data-id="${m.id}" onchange="updateMemberRole('${m.id}', this.value)" style="font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;width:90px;">
+          ${opts}
+        </select>
+      </td>
       <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
     tbody.appendChild(tr);
   });
+}
+
+async function updateMemberRole(id, newRole) {
+  const { error } = await db.from('members').update({ role: newRole }).eq('id', id);
+  if (error) {
+    alert('役職の変更に失敗しました。RLSの設定を確認してください。');
+    await loadAdminMembers();
+  }
 }
 
 async function addMember() {
