@@ -210,6 +210,29 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .btn-cancel{padding:11px 18px;font-size:14px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);min-height:46px}
 
 ::-webkit-scrollbar{width:3px;height:3px}
+.quiz-banner{background:var(--blue-bg);border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;display:none}
+.quiz-banner.active{display:block}
+.quiz-question{font-size:14px;font-weight:600;color:var(--blue);line-height:1.6;margin-bottom:10px}
+.quiz-timer{font-size:12px;color:var(--blue);margin-bottom:8px;font-weight:500}
+.quiz-answer-row{display:flex;gap:8px}
+.quiz-answer-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
+.quiz-answer-ta:focus{outline:none;border-color:var(--blue)}
+.quiz-submit-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;height:48px;white-space:nowrap;flex-shrink:0}
+.quiz-submitted{font-size:12px;color:var(--teal);font-weight:500;padding:6px 0}
+.dash-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.dash-card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.quiz-row{background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.quiz-row-q{font-size:13px;font-weight:600;color:var(--text)}
+.quiz-status-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.quiz-draft{background:var(--surface2);color:var(--text3);border:0.5px solid var(--border2)}
+.quiz-active{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
+.quiz-closed{background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2)}
+.quiz-answer-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.quiz-answer-item{font-size:12px;padding:7px 10px;background:var(--surface);border-radius:var(--radius-sm);border:0.5px solid var(--border);display:flex;align-items:baseline;gap:8px}
+.quiz-answer-name{font-weight:600;color:var(--text2);min-width:80px;flex-shrink:0}
+.quiz-answer-time{font-size:10px;color:var(--teal);font-weight:600;min-width:50px;flex-shrink:0}
+.quiz-answer-text{color:var(--text);flex:1}
+.quiz-avg{font-size:12px;color:var(--text2);font-weight:500}
 .qr-btn{flex-shrink:0;font-size:11px;color:var(--blue);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
 .case-item:hover .qr-btn,.case-item.active .qr-btn{opacity:1}
 .qr-btn:active{color:var(--teal)}
@@ -332,6 +355,16 @@ textarea,input{-webkit-appearance:none;appearance:none}
         <button class="tag-filter-btn" data-tag="質問" onclick="filterTag(this)">質問</button>
       </div>
     </div>
+    <div class="quiz-banner" id="quiz-banner">
+      <div class="quiz-question" id="quiz-banner-question"></div>
+      <div class="quiz-timer" id="quiz-banner-timer"></div>
+      <div id="quiz-answer-area">
+        <div class="quiz-answer-row">
+          <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea>
+          <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button>
+        </div>
+      </div>
+    </div>
     <div class="messages" id="messages">
       <div class="no-case">☰ メニューから症例を選択してください</div>
     </div>
@@ -370,6 +403,16 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <button class="admin-back" onclick="goChat()">← 戻る</button>
   </div>
   <div class="admin-scroll">
+    <div class="dash-card" id="quiz-dashboard">
+      <div class="dash-card-title">問題管理ダッシュボード</div>
+      <div style="font-size:12px;color:var(--text3);" id="quiz-case-label">症例を選択してください</div>
+      <div id="quiz-create-area" style="display:none;flex-direction:column;gap:8px;">
+        <textarea class="msg-ta" id="quiz-question-input" style="height:64px;" placeholder="問題文を入力..."></textarea>
+        <button class="admin-add-btn" onclick="createQuiz()">問題を作成</button>
+      </div>
+      <div id="quiz-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
     <div class="admin-panel">
       <div class="admin-panel-header">登録隊員一覧</div>
       <table class="member-table">
@@ -475,7 +518,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
-
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -771,6 +813,7 @@ async function selectCase(c) {
   document.querySelectorAll('.tag-filter-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tag === 'all'));
   await loadMessages();
+  await loadActiveQuiz();
   subscribeRealtime();
 }
 
@@ -1044,6 +1087,21 @@ function subscribeRealtime() {
       () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
     )
     .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'quizzes', filter: `case_id=eq.${currentCase.id}` },
+      async payload => {
+        realtimeOk = true; updateRealtimeIndicator();
+        await loadActiveQuiz();
+        if (currentUser && currentUser.is_admin) await loadQuizDashboard();
+      }
+    )
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'quiz_answers' },
+      async () => {
+        realtimeOk = true; updateRealtimeIndicator();
+        if (currentUser && currentUser.is_admin) await loadQuizDashboard();
+      }
+    )
+    .on('postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'cases', filter: `id=eq.${currentCase.id}` },
       payload => {
         realtimeOk = true; updateRealtimeIndicator();
@@ -1102,7 +1160,7 @@ function stopRealtime() {
 /* ================================================
    管理者画面
 ================================================ */
-async function goAdmin() { showScreen('admin'); await loadAdminMembers(); await loadInviteCodes(); }
+async function goAdmin() { showScreen('admin'); await loadAdminMembers(); await loadInviteCodes(); await loadQuizDashboard(); }
 function goChat() { showScreen('chat'); }
 
 async function loadAdminMembers() {
@@ -1268,6 +1326,173 @@ async function setTotalSlides(val) {
     currentCase.current_slide = tot;
     await db.from('cases').update({ current_slide: tot }).eq('id', currentCase.id);
     document.getElementById('slide-current').textContent = tot;
+  }
+}
+
+/* ================================================
+   クイズ機能
+================================================ */
+let quizTimerInterval = null;
+let currentQuizId     = null;
+
+async function loadQuizDashboard() {
+  const label = document.getElementById('quiz-case-label');
+  const area  = document.getElementById('quiz-create-area');
+  const list  = document.getElementById('quiz-list');
+  if (!currentCase) {
+    label.textContent = '症例を選択してチャットに戻ってから管理者画面を開いてください';
+    area.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  label.textContent = `症例: ${currentCase.title}`;
+  area.style.display = 'flex';
+
+  const { data: quizzes } = await db.from('quizzes')
+    .select('*').eq('case_id', currentCase.id).order('created_at');
+  list.innerHTML = '';
+  if (!quizzes || quizzes.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);">問題がありません</div>';
+    return;
+  }
+  for (const q of quizzes) {
+    const { data: answers } = await db.from('quiz_answers')
+      .select('*').eq('quiz_id', q.id).order('answered_at');
+    const avg = answers && answers.length > 0
+      ? Math.round(answers.reduce((s, a) => s + (a.elapsed_seconds || 0), 0) / answers.length)
+      : null;
+    const statusLabel = { draft: '未開始', active: '開始中', closed: '終了' }[q.status] || q.status;
+    const statusCls   = { draft: 'quiz-draft', active: 'quiz-active', closed: 'quiz-closed' }[q.status] || 'quiz-draft';
+    const answerHTML = answers && answers.length > 0
+      ? answers.map(a => `
+        <div class="quiz-answer-item">
+          <span class="quiz-answer-name">${esc(a.display_name)}</span>
+          <span class="quiz-answer-time">${a.elapsed_seconds != null ? a.elapsed_seconds + '秒' : '-'}</span>
+          <span class="quiz-answer-text">${esc(a.answer)}</span>
+        </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);padding:4px 0;">まだ回答がありません</div>';
+    const avgHTML = avg != null ? `<div class="quiz-avg">平均回答時間: ${avg}秒 （${answers.length}名回答）</div>` : '';
+    const startBtn = q.status === 'draft'
+      ? `<button onclick="startQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;cursor:pointer;font-family:inherit;">開始</button>` : '';
+    const closeBtn = q.status === 'active'
+      ? `<button onclick="closeQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;">終了</button>` : '';
+    const delBtn = q.status !== 'active'
+      ? `<button onclick="deleteQuiz('${q.id}')" style="font-size:11px;color:var(--red);background:none;border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;font-family:inherit;">削除</button>` : '';
+    const row = document.createElement('div');
+    row.className = 'quiz-row';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="quiz-status-badge ${statusCls}">${statusLabel}</span>
+        <span class="quiz-row-q">${esc(q.question)}</span>
+        <div style="margin-left:auto;display:flex;gap:6px;">${startBtn}${closeBtn}${delBtn}</div>
+      </div>
+      ${avgHTML}
+      <div class="quiz-answer-list">${answerHTML}</div>`;
+    list.appendChild(row);
+  }
+}
+
+async function createQuiz() {
+  const q = document.getElementById('quiz-question-input').value.trim();
+  if (!q || !currentCase) return;
+  const { error } = await db.from('quizzes').insert({
+    case_id: currentCase.id, question: q,
+    status: 'draft', created_by: currentUser.display_name
+  });
+  if (!error) {
+    document.getElementById('quiz-question-input').value = '';
+    await loadQuizDashboard();
+  } else alert('作成に失敗しました');
+}
+
+async function startQuiz(quizId) {
+  const { error } = await db.from('quizzes')
+    .update({ status: 'active', started_at: new Date().toISOString() })
+    .eq('id', quizId);
+  if (!error) await loadQuizDashboard();
+  else alert('開始に失敗しました');
+}
+
+async function closeQuiz(quizId) {
+  const { error } = await db.from('quizzes')
+    .update({ status: 'closed', closed_at: new Date().toISOString() })
+    .eq('id', quizId);
+  if (!error) await loadQuizDashboard();
+  else alert('終了に失敗しました');
+}
+
+async function deleteQuiz(quizId) {
+  if (!confirm('この問題を削除しますか?')) return;
+  await db.from('quizzes').delete().eq('id', quizId);
+  await loadQuizDashboard();
+}
+
+// 参加者向け：アクティブな問題を取得してバナー表示
+async function loadActiveQuiz() {
+  if (!currentCase) return;
+  const { data } = await db.from('quizzes')
+    .select('*').eq('case_id', currentCase.id).eq('status', 'active').single();
+  if (data) showQuizBanner(data);
+  else hideQuizBanner();
+}
+
+function showQuizBanner(quiz) {
+  currentQuizId = quiz.id;
+  document.getElementById('quiz-banner-question').textContent = quiz.question;
+  document.getElementById('quiz-banner').classList.add('active');
+  // 既回答チェック
+  const answeredKey = 'quiz_answered_' + quiz.id;
+  if (localStorage.getItem(answeredKey)) {
+    document.getElementById('quiz-answer-area').innerHTML =
+      '<div class="quiz-submitted">回答済みです</div>';
+  } else {
+    document.getElementById('quiz-answer-area').innerHTML = `
+      <div class="quiz-answer-row">
+        <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea>
+        <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button>
+      </div>`;
+  }
+  // タイマー表示
+  if (quizTimerInterval) clearInterval(quizTimerInterval);
+  const startedAt = new Date(quiz.started_at).getTime();
+  quizTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+    const el = document.getElementById('quiz-banner-timer');
+    if (el) el.textContent = `経過時間: ${elapsed}秒`;
+  }, 1000);
+}
+
+function hideQuizBanner() {
+  currentQuizId = null;
+  document.getElementById('quiz-banner').classList.remove('active');
+  if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
+}
+
+async function submitQuizAnswer() {
+  const ta = document.getElementById('quiz-answer-input');
+  const answer = ta ? ta.value.trim() : '';
+  if (!answer || !currentQuizId) return;
+  const btn = document.getElementById('quiz-submit-btn');
+  if (btn) btn.disabled = true;
+
+  // 開始時刻を取得して経過秒数を計算
+  const { data: quiz } = await db.from('quizzes').select('started_at').eq('id', currentQuizId).single();
+  const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
+
+  const { error } = await db.from('quiz_answers').insert({
+    quiz_id:         currentQuizId,
+    member_id:       currentUser.id !== 'admin' ? currentUser.id : null,
+    display_name:    currentUser.is_admin ? '管理者' : currentUser.display_name,
+    answer,
+    elapsed_seconds: elapsed
+  });
+  if (!error) {
+    localStorage.setItem('quiz_answered_' + currentQuizId, '1');
+    document.getElementById('quiz-answer-area').innerHTML =
+      '<div class="quiz-submitted">回答しました！</div>';
+  } else {
+    if (btn) btn.disabled = false;
+    alert('送信に失敗しました');
   }
 }
 
