@@ -85,6 +85,12 @@ textarea,input{-webkit-appearance:none;appearance:none}
 #realtime-indicator{width:8px;height:8px;border-radius:50%;background:#9a9a94;flex-shrink:0;transition:background .4s;}
 
 .case-header{padding:10px 14px;border-bottom:0.5px solid var(--border);background:var(--surface);display:none}
+.mode-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:99px;flex-shrink:0}
+.mode-public{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
+.mode-private{background:var(--amber-bg);color:var(--amber);border:0.5px solid #fac775}
+.case-header-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.mode-toggle-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;cursor:pointer;flex-shrink:0}
+.case-item-private{font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:3px;padding:1px 4px;flex-shrink:0}
 .case-header.visible{display:block}
 .case-header-title{font-size:14px;font-weight:700;color:var(--text)}
 .case-header-sub{font-size:11px;color:var(--text3);margin-top:1px;margin-bottom:8px}
@@ -290,7 +296,11 @@ textarea,input{-webkit-appearance:none;appearance:none}
       <div id="realtime-indicator" title="接続確認中"></div>
     </div>
     <div class="case-header" id="case-header">
-      <div class="case-header-title" id="case-header-title"></div>
+      <div class="case-header-top">
+        <div class="case-header-title" id="case-header-title" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+        <span id="case-mode-badge" class="mode-badge mode-public">公開</span>
+        <button id="case-mode-toggle" class="mode-toggle-btn hidden" onclick="toggleCaseMode()" title="モードを切り替え">⇄</button>
+      </div>
       <div class="case-header-sub" id="case-header-sub"></div>
       <div class="tag-filters">
         <button class="tag-filter-btn active" data-tag="all" onclick="filterTag(this)">すべて</button>
@@ -393,6 +403,21 @@ textarea,input{-webkit-appearance:none;appearance:none}
         <div class="field-label">概要（任意）</div>
         <textarea class="msg-ta" id="case-summary" style="height:70px;" placeholder="症例の簡単なメモ..."></textarea>
       </div>
+      <div id="case-mode-field">
+        <div class="field-label">公開設定</div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:var(--surface2);">
+            <input type="radio" name="case-mode" value="public" checked style="accent-color:var(--teal);width:16px;height:16px;">
+            <span style="font-size:13px;font-weight:500;">掲示板</span>
+            <span style="font-size:11px;color:var(--text3);">全員が閲覧</span>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:var(--surface2);">
+            <input type="radio" name="case-mode" value="private" style="accent-color:var(--amber);width:16px;height:16px;">
+            <span style="font-size:13px;font-weight:500;">非公開</span>
+            <span style="font-size:11px;color:var(--text3);">管理者のみ</span>
+          </label>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeNewCaseModal()">キャンセル</button>
@@ -407,6 +432,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -614,15 +640,20 @@ async function loadCases() {
     return;
   }
   data.forEach(c => {
+    // 非公開症例は管理者のみ表示
+    if (c.mode === 'private' && currentUser && !currentUser.is_admin) return;
     const el = document.createElement('div');
     el.className  = 'case-item';
     el.dataset.id = c.id;
     const delBtn = currentUser && currentUser.is_admin
       ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>`
       : '';
+    const privateBadge = c.mode === 'private'
+      ? `<span class="case-item-private">非公開</span>` : '';
     el.innerHTML  = `
       <div class="case-item-row">
         <div class="case-item-title" style="flex:1;min-width:0;">${esc(c.title)}</div>
+        ${privateBadge}
         ${delBtn}
       </div>
       <div class="case-item-meta">${c.occurred_at||''}</div>`;
@@ -656,6 +687,15 @@ async function selectCase(c) {
   document.getElementById('case-header').classList.add('visible');
   document.getElementById('case-header-title').textContent = c.title;
   document.getElementById('case-header-sub').textContent   = c.occurred_at || '';
+  // モードバッジ更新
+  const badge = document.getElementById('case-mode-badge');
+  const isPrivate = c.mode === 'private';
+  badge.textContent = isPrivate ? '非公開' : '公開';
+  badge.className   = 'mode-badge ' + (isPrivate ? 'mode-private' : 'mode-public');
+  // 管理者のみトグルボタンを表示
+  const toggleBtn = document.getElementById('case-mode-toggle');
+  if (currentUser && currentUser.is_admin) toggleBtn.classList.remove('hidden');
+  else toggleBtn.classList.add('hidden');
   document.getElementById('input-area').style.display = '';
   filterTagVal = 'all';
   document.querySelectorAll('.tag-filter-btn').forEach(b =>
@@ -666,6 +706,10 @@ async function selectCase(c) {
 
 function openNewCaseModal() {
   document.getElementById('case-date').value = new Date().toISOString().split('T')[0];
+  // 管理者のみモード選択を表示
+  document.getElementById('case-mode-field').style.display = currentUser && currentUser.is_admin ? '' : 'none';
+  // デフォルトを掲示板に戻す
+  document.querySelector('input[name="case-mode"][value="public"]').checked = true;
   document.getElementById('modal-new-case').classList.add('active');
 }
 function closeNewCaseModal() {
@@ -677,10 +721,13 @@ async function createCase() {
   const date    = document.getElementById('case-date').value;
   const summary = document.getElementById('case-summary').value.trim();
   if (!title) return;
+  const modeEl = document.querySelector('input[name="case-mode"]:checked');
+  const mode = (currentUser && currentUser.is_admin && modeEl) ? modeEl.value : 'public';
   const { data, error } = await db.from('cases').insert({
     title, occurred_at: date || null,
     patient_summary: summary || null,
-    created_by: currentUser.display_name
+    created_by: currentUser.display_name,
+    mode
   }).select().single();
   if (!error && data) {
     closeNewCaseModal();
@@ -712,6 +759,11 @@ async function loadMessages() {
   }
   parents.forEach(msg => {
     if (filterTagVal !== 'all' && msg.tag !== filterTagVal) return;
+    // 非公開症例：管理者か投稿者本人のみ表示
+    if (currentCase && currentCase.mode === 'private' && !currentUser.is_admin) {
+      const isMine = !msg.is_anonymous && msg.display_name === currentUser.display_name;
+      if (!isMine) return;
+    }
     container.appendChild(buildMsgEl(msg, children.filter(r => r.parent_id === msg.id)));
   });
   if (atBottom) container.scrollTop = container.scrollHeight;
@@ -1056,6 +1108,24 @@ async function deleteInviteCode(id, code) {
 
 
 
+
+async function toggleCaseMode() {
+  if (!currentCase || !currentUser || !currentUser.is_admin) return;
+  const newMode = currentCase.mode === 'private' ? 'public' : 'private';
+  const label   = newMode === 'private' ? '非公開' : '掲示板（公開）';
+  if (!confirm(`この症例を「${label}」モードに変更しますか?`)) return;
+  const { error } = await db.from('cases').update({ mode: newMode }).eq('id', currentCase.id);
+  if (error) { alert('変更に失敗しました'); return; }
+  currentCase.mode = newMode;
+  // バッジ更新
+  const badge = document.getElementById('case-mode-badge');
+  const isPrivate = newMode === 'private';
+  badge.textContent = isPrivate ? '非公開' : '公開';
+  badge.className   = 'mode-badge ' + (isPrivate ? 'mode-private' : 'mode-public');
+  // サイドバーも更新
+  await loadCases();
+  await loadMessages();
+}
 
 /* ================================================
    ユーティリティ
