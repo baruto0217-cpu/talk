@@ -89,6 +89,14 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .mode-public{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
 .mode-private{background:var(--amber-bg);color:var(--amber);border:0.5px solid #fac775}
 .case-header-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.slide-ctrl{display:none;align-items:center;gap:6px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;margin-top:6px}
+.slide-ctrl.visible{display:flex}
+.slide-ctrl-label{font-size:12px;font-weight:600;color:var(--text2);min-width:70px}
+.slide-ctrl-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.slide-ctrl-btn:active{background:var(--surface2)}
+.slide-ctrl-num{font-size:13px;font-weight:600;color:var(--text);min-width:50px;text-align:center}
+.slide-ctrl-total{font-size:12px;color:var(--text3)}
+.slide-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);margin-right:4px;flex-shrink:0}
 .mode-toggle-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;cursor:pointer;flex-shrink:0}
 .case-item-private{font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:3px;padding:1px 4px;flex-shrink:0}
 .case-header.visible{display:block}
@@ -302,6 +310,17 @@ textarea,input{-webkit-appearance:none;appearance:none}
         <button id="case-mode-toggle" class="mode-toggle-btn hidden" onclick="toggleCaseMode()" title="モードを切り替え">⇄</button>
       </div>
       <div class="case-header-sub" id="case-header-sub"></div>
+      <div class="slide-ctrl" id="slide-ctrl">
+        <span class="slide-ctrl-label">スライド</span>
+        <button class="slide-ctrl-btn" onclick="changeSlide(-1)">−</button>
+        <span class="slide-ctrl-num" id="slide-current">1</span>
+        <span class="slide-ctrl-total" id="slide-total">/ 1</span>
+        <button class="slide-ctrl-btn" onclick="changeSlide(1)">＋</button>
+        <span style="font-size:11px;color:var(--text3);margin-left:4px;">枚設定:</span>
+        <input type="number" id="slide-total-input" min="1" max="99" value="1"
+          style="width:44px;font-size:12px;padding:4px 6px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;"
+          onchange="setTotalSlides(this.value)">
+      </div>
       <div class="tag-filters">
         <button class="tag-filter-btn active" data-tag="all" onclick="filterTag(this)">すべて</button>
         <button class="tag-filter-btn" data-tag="良かった点" onclick="filterTag(this)">良かった点</button>
@@ -418,6 +437,10 @@ textarea,input{-webkit-appearance:none;appearance:none}
           </label>
         </div>
       </div>
+      <div id="case-slides-field" style="display:none;">
+        <div class="field-label">スライド総枚数</div>
+        <input class="field-input" type="number" id="case-total-slides-input" min="1" max="99" value="10" style="font-size:14px;padding:10px;">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeNewCaseModal()">キャンセル</button>
@@ -432,7 +455,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
-
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -695,6 +717,18 @@ async function selectCase(c) {
   const toggleBtn = document.getElementById('case-mode-toggle');
   if (currentUser && currentUser.is_admin) toggleBtn.classList.remove('hidden');
   else toggleBtn.classList.add('hidden');
+  // スライドコントロール更新（管理者かつ非公開症例のみ表示）
+  const slideCtrl = document.getElementById('slide-ctrl');
+  if (currentUser && currentUser.is_admin && c.mode === 'private') {
+    slideCtrl.classList.add('visible');
+    const cur = c.current_slide || 1;
+    const tot = c.total_slides  || 1;
+    document.getElementById('slide-current').textContent    = cur;
+    document.getElementById('slide-total').textContent      = '/ ' + tot;
+    document.getElementById('slide-total-input').value      = tot;
+  } else {
+    slideCtrl.classList.remove('visible');
+  }
   document.getElementById('input-area').style.display = '';
   filterTagVal = 'all';
   document.querySelectorAll('.tag-filter-btn').forEach(b =>
@@ -707,8 +741,16 @@ function openNewCaseModal() {
   document.getElementById('case-date').value = new Date().toISOString().split('T')[0];
   // 管理者のみモード選択を表示
   document.getElementById('case-mode-field').style.display = currentUser && currentUser.is_admin ? '' : 'none';
+  document.getElementById('case-slides-field').style.display = 'none';
   // デフォルトを掲示板に戻す
   document.querySelector('input[name="case-mode"][value="public"]').checked = true;
+  // モード変更時にスライド入力を表示/非表示
+  document.querySelectorAll('input[name="case-mode"]').forEach(r => {
+    r.onchange = () => {
+      document.getElementById('case-slides-field').style.display =
+        r.value === 'private' ? '' : 'none';
+    };
+  });
   document.getElementById('modal-new-case').classList.add('active');
 }
 function closeNewCaseModal() {
@@ -722,11 +764,14 @@ async function createCase() {
   if (!title) return;
   const modeEl = document.querySelector('input[name="case-mode"]:checked');
   const mode = (currentUser && currentUser.is_admin && modeEl) ? modeEl.value : 'public';
+  const totalSl = parseInt(document.getElementById('case-total-slides-input')?.value)||1;
   const { data, error } = await db.from('cases').insert({
     title, occurred_at: date || null,
     patient_summary: summary || null,
     created_by: currentUser.display_name,
-    mode
+    mode,
+    current_slide: 1,
+    total_slides: totalSl
   }).select().single();
   if (!error && data) {
     closeNewCaseModal();
@@ -758,10 +803,11 @@ async function loadMessages() {
   }
   parents.forEach(msg => {
     if (filterTagVal !== 'all' && msg.tag !== filterTagVal) return;
-    // 非公開症例：管理者か投稿者本人のみ表示
+    // 非公開症例：自分の投稿 or 管理者の投稿のみ表示（管理者は全件表示）
     if (currentCase && currentCase.mode === 'private' && !currentUser.is_admin) {
-      const isMine = !msg.is_anonymous && msg.display_name === currentUser.display_name;
-      if (!isMine) return;
+      const isMine    = !msg.is_anonymous && msg.display_name === currentUser.display_name;
+      const isAdminMsg = msg.display_name === '管理者' || msg.role === '管理者';
+      if (!isMine && !isAdminMsg) return;
     }
     container.appendChild(buildMsgEl(msg, children.filter(r => r.parent_id === msg.id)));
   });
@@ -792,11 +838,14 @@ function buildMsgEl(msg, replies) {
   const delMsgHTML = canDelete
     ? `<button class="del-msg-btn" onclick="deleteMessage('${msg.id}', false)" title="削除">✕</button>` : '';
 
+  const slideHTML = msg.slide_no
+    ? `<span class="slide-badge">スライド ${msg.slide_no}</span>` : '';
   div.innerHTML = `
     <div class="msg-header">
       <div class="avatar">${initial}</div>
       <span class="msg-name">${name}</span>
       <span class="msg-time">${formatTime(msg.created_at)}</span>
+      ${slideHTML}
       ${tagHTML}
       ${delMsgHTML}
     </div>
@@ -919,7 +968,8 @@ async function sendMessage() {
     role:         currentUser.is_admin ? '管理者' : currentUser.role,
     body,
     tag:          currentTag === 'なし' ? null : currentTag,
-    is_anonymous: document.getElementById('anon-check').checked
+    is_anonymous: document.getElementById('anon-check').checked,
+    slide_no:     currentCase && currentCase.mode === 'private' ? (currentCase.current_slide || 1) : null
   });
   sendBtn.disabled = false;
   if (!error) ta.value = '';
@@ -955,6 +1005,22 @@ function subscribeRealtime() {
     .on('postgres_changes',
       { event: 'DELETE', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
       () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
+    )
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'cases', filter: `id=eq.${currentCase.id}` },
+      payload => {
+        realtimeOk = true; updateRealtimeIndicator();
+        if (payload.new) {
+          currentCase.current_slide = payload.new.current_slide;
+          currentCase.total_slides  = payload.new.total_slides;
+          const cur = payload.new.current_slide || 1;
+          const tot = payload.new.total_slides  || 1;
+          const el = document.getElementById('slide-current');
+          const tl = document.getElementById('slide-total');
+          if (el) el.textContent = cur;
+          if (tl) tl.textContent = '/ ' + tot;
+        }
+      }
     )
     .subscribe(status => {
       if (status === 'SUBSCRIBED') {
@@ -1107,6 +1173,31 @@ async function deleteInviteCode(id, code) {
 
 
 
+
+async function changeSlide(delta) {
+  if (!currentCase || !currentUser || !currentUser.is_admin) return;
+  const tot = currentCase.total_slides || 1;
+  const cur = Math.min(Math.max((currentCase.current_slide || 1) + delta, 1), tot);
+  const { error } = await db.from('cases').update({ current_slide: cur }).eq('id', currentCase.id);
+  if (error) { alert('更新に失敗しました'); return; }
+  currentCase.current_slide = cur;
+  document.getElementById('slide-current').textContent = cur;
+}
+
+async function setTotalSlides(val) {
+  if (!currentCase || !currentUser || !currentUser.is_admin) return;
+  const tot = Math.max(parseInt(val) || 1, 1);
+  const { error } = await db.from('cases').update({ total_slides: tot }).eq('id', currentCase.id);
+  if (error) { alert('更新に失敗しました'); return; }
+  currentCase.total_slides = tot;
+  document.getElementById('slide-total').textContent = '/ ' + tot;
+  // currentが超えたら修正
+  if ((currentCase.current_slide || 1) > tot) {
+    currentCase.current_slide = tot;
+    await db.from('cases').update({ current_slide: tot }).eq('id', currentCase.id);
+    document.getElementById('slide-current').textContent = tot;
+  }
+}
 
 async function toggleCaseMode() {
   if (!currentCase || !currentUser || !currentUser.is_admin) return;
