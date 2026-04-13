@@ -205,30 +205,56 @@ textarea,input{-webkit-appearance:none;appearance:none}
   <div class="login-card">
     <div class="login-logo">救急振り返りルーム</div>
     <div class="login-sub">署内スタッフ専用</div>
-    <div class="login-step" id="step1">
-      <div>
-        <div class="field-label">合言葉</div>
-        <input class="field-input" type="password" id="pw-input" placeholder="合言葉を入力..." autocomplete="off">
-      </div>
-      <div class="error-msg" id="pw-error">合言葉が違います</div>
-      <button class="btn-primary" onclick="submitPassphrase()">次へ</button>
+
+    <!-- タブ切り替え -->
+    <div style="display:flex;gap:0;margin-bottom:1.4rem;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;">
+      <button id="tab-login" onclick="switchTab('login')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--text);color:#fff;font-family:inherit;cursor:pointer;">ログイン</button>
+      <button id="tab-register" onclick="switchTab('register')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--surface2);color:var(--text2);font-family:inherit;cursor:pointer;">新規登録</button>
     </div>
-    <div class="login-step hidden" id="step2">
-      <div id="admin-direct-wrap" class="hidden">
-        <div style="font-size:12px;color:var(--text2);background:var(--amber-bg);border:0.5px solid #fac775;border-radius:var(--radius-sm);padding:10px 12px;line-height:1.6;">
-          管理者合言葉で認証されました。名前を選ばずに管理者画面へ入ることもできます。
-        </div>
-        <button class="btn-primary" style="background:var(--amber);" onclick="enterAdminDirect()">管理者画面へ入る</button>
-        <div style="font-size:11px;color:var(--text3);text-align:center;">または下から名前を選んでチャットに参加</div>
+
+    <!-- ログインフォーム -->
+    <div id="form-login" style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div class="field-label">氏名</div>
+        <input class="field-input" type="text" id="login-name" placeholder="例：田中 一郎" autocomplete="username">
       </div>
       <div>
-        <div class="field-label">あなたの名前を選択</div>
-        <div class="name-grid" id="name-grid">
-          <div style="font-size:12px;color:var(--text3);padding:8px;grid-column:span 2">読み込み中...</div>
-        </div>
+        <div class="field-label">パスワード</div>
+        <input class="field-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
       </div>
-      <div class="error-msg" id="name-error">名前を選択してください</div>
-      <button class="btn-primary" id="enter-btn" onclick="enterChat()" disabled>入室する</button>
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn-primary" onclick="doLogin()">ログイン</button>
+    </div>
+
+    <!-- 新規登録フォーム -->
+    <div id="form-register" style="display:none;flex-direction:column;gap:14px;">
+      <div>
+        <div class="field-label">招待コード</div>
+        <input class="field-input" type="text" id="reg-code" placeholder="例：AICHI-001" autocomplete="off">
+      </div>
+      <div>
+        <div class="field-label">氏名</div>
+        <input class="field-input" type="text" id="reg-name" placeholder="例：田中 一郎">
+      </div>
+      <div>
+        <div class="field-label">役職</div>
+        <select class="field-input" id="reg-role" style="font-size:14px;">
+          <option value="">選択してください</option>
+          <option>隊長</option>
+          <option>救命士</option>
+          <option>隊員</option>
+        </select>
+      </div>
+      <div>
+        <div class="field-label">パスワード</div>
+        <input class="field-input" type="password" id="reg-pw" placeholder="6文字以上" autocomplete="new-password">
+      </div>
+      <div>
+        <div class="field-label">パスワード（確認）</div>
+        <input class="field-input" type="password" id="reg-pw2" placeholder="もう一度入力" autocomplete="new-password">
+      </div>
+      <div class="error-msg" id="reg-error"></div>
+      <button class="btn-primary" onclick="doRegister()">登録する</button>
     </div>
   </div>
 </div>
@@ -368,6 +394,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -385,8 +412,11 @@ let realtimeOk       = false;
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('kyukyu_user');
   if (saved) { currentUser = JSON.parse(saved); startChat(); }
-  document.getElementById('pw-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') submitPassphrase();
+  document.getElementById('login-pw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('reg-pw2').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doRegister();
   });
   document.getElementById('msg-input').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -406,84 +436,140 @@ function closeSidebar() {
 }
 
 /* ================================================
+   認証ユーティリティ
+================================================ */
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('form-login').style.display    = isLogin ? 'flex' : 'none';
+  document.getElementById('form-register').style.display = isLogin ? 'none' : 'flex';
+  document.getElementById('tab-login').style.background    = isLogin ? 'var(--text)' : 'var(--surface2)';
+  document.getElementById('tab-login').style.color         = isLogin ? '#fff' : 'var(--text2)';
+  document.getElementById('tab-register').style.background = isLogin ? 'var(--surface2)' : 'var(--text)';
+  document.getElementById('tab-register').style.color      = isLogin ? 'var(--text2)' : '#fff';
+}
+
+async function hashPassword(pw) {
+  const buf = new TextEncoder().encode(pw);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function clearAuthError(id) {
+  const el = document.getElementById(id);
+  el.textContent = '';
+  el.style.display = 'none';
+}
+
+/* ================================================
    ログイン
 ================================================ */
-async function submitPassphrase() {
-  const input = document.getElementById('pw-input').value.trim();
-  const errEl = document.getElementById('pw-error');
-  errEl.style.display = 'none';
+async function doLogin() {
+  clearAuthError('login-error');
+  const name = document.getElementById('login-name').value.trim();
+  const pw   = document.getElementById('login-pw').value;
+  if (!name || !pw) { showAuthError('login-error', '氏名とパスワードを入力してください'); return; }
 
-  // ボタンをローディング状態に
-  const btn = document.querySelector('#step1 .btn-primary');
-  btn.disabled = true;
-  btn.textContent = '確認中...';
+  const btn = document.querySelector('#form-login .btn-primary');
+  btn.disabled = true; btn.textContent = '確認中...';
 
-  const { data, error } = await db.from('settings').select('key,value');
+  const hash = await hashPassword(pw);
+  const { data, error } = await db.from('members')
+    .select('*')
+    .eq('display_name', name)
+    .eq('password_hash', hash)
+    .eq('is_registered', true)
+    .single();
 
-  btn.disabled = false;
-  btn.textContent = '次へ';
+  btn.disabled = false; btn.textContent = 'ログイン';
 
-  if (error) {
-    errEl.textContent = 'エラー: ' + (error.message || 'サーバーに接続できません');
-    errEl.style.display = 'block';
-    return;
-  }
-  if (!data || data.length === 0) {
-    errEl.textContent = 'settings テーブルが空です。Supabaseにデータを登録してください。';
-    errEl.style.display = 'block';
-    return;
-  }
-  const settings  = Object.fromEntries(data.map(r => [r.key, r.value]));
-  const isAdmin   = input === settings['passphrase_admin'];
-  const isGeneral = input === settings['passphrase_general'];
-
-  if (!isAdmin && !isGeneral) {
-    errEl.textContent = '合言葉が違います';
-    errEl.style.display = 'block';
+  if (error || !data) {
+    showAuthError('login-error', '氏名またはパスワードが違います');
     return;
   }
 
-  const { data: members } = await db.from('members').select('*').order('role').order('display_name');
-  const grid = document.getElementById('name-grid');
-  grid.innerHTML = '';
-  (members || []).forEach(m => {
-    const btn = document.createElement('button');
-    btn.className     = 'name-btn';
-    btn.dataset.id    = m.id;
-    btn.dataset.name  = m.display_name;
-    btn.dataset.role  = m.role;
-    btn.dataset.admin = isAdmin ? '1' : '0';
-    btn.innerHTML     = `${m.display_name}<div class="name-role">${m.role}</div>`;
-    btn.onclick       = () => selectMember(btn);
-    grid.appendChild(btn);
-  });
+  // 管理者ロールチェック（settingsで管理者フラグを確認）
+  const { data: settings } = await db.from('settings').select('key,value');
+  const sMap = Object.fromEntries((settings||[]).map(r=>[r.key,r.value]));
+  const isAdmin = data.role === '隊長' || sMap['admin_member_id'] === data.id;
 
-  if (isAdmin) document.getElementById('admin-direct-wrap').classList.remove('hidden');
-  document.getElementById('step1').classList.add('hidden');
-  document.getElementById('step2').classList.remove('hidden');
-}
-
-function selectMember(btn) {
-  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  document.getElementById('enter-btn').disabled = false;
-}
-
-async function enterAdminDirect() {
-  currentUser = { id: 'admin', display_name: '管理者', role: '管理者', is_admin: true };
-  localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
-  showScreen('admin');
-  await loadAdminMembers();
-}
-
-async function enterChat() {
-  const selected = document.querySelector('.name-btn.selected');
-  if (!selected) return;
   currentUser = {
-    id:           selected.dataset.id,
-    display_name: selected.dataset.name,
-    role:         selected.dataset.role,
-    is_admin:     selected.dataset.admin === '1'
+    id:           data.id,
+    display_name: data.display_name,
+    role:         data.role,
+    is_admin:     isAdmin
+  };
+  localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
+  await startChat();
+}
+
+/* ================================================
+   新規登録
+================================================ */
+async function doRegister() {
+  clearAuthError('reg-error');
+  const code  = document.getElementById('reg-code').value.trim().toUpperCase();
+  const name  = document.getElementById('reg-name').value.trim();
+  const role  = document.getElementById('reg-role').value;
+  const pw    = document.getElementById('reg-pw').value;
+  const pw2   = document.getElementById('reg-pw2').value;
+
+  if (!code)        { showAuthError('reg-error', '招待コードを入力してください'); return; }
+  if (!name)        { showAuthError('reg-error', '氏名を入力してください'); return; }
+  if (!role)        { showAuthError('reg-error', '役職を選択してください'); return; }
+  if (pw.length < 6){ showAuthError('reg-error', 'パスワードは6文字以上にしてください'); return; }
+  if (pw !== pw2)   { showAuthError('reg-error', 'パスワードが一致しません'); return; }
+
+  const btn = document.querySelector('#form-register .btn-primary');
+  btn.disabled = true; btn.textContent = '登録中...';
+
+  // 招待コード確認
+  const { data: invite, error: invErr } = await db.from('invite_codes')
+    .select('*').eq('code', code).eq('used', false).single();
+
+  if (invErr || !invite) {
+    btn.disabled = false; btn.textContent = '登録する';
+    showAuthError('reg-error', '招待コードが無効または使用済みです');
+    return;
+  }
+
+  // 同名チェック
+  const { data: existing } = await db.from('members')
+    .select('id').eq('display_name', name).eq('is_registered', true).single();
+  if (existing) {
+    btn.disabled = false; btn.textContent = '登録する';
+    showAuthError('reg-error', 'その氏名はすでに登録されています');
+    return;
+  }
+
+  const hash = await hashPassword(pw);
+
+  // メンバー登録
+  const { data: newMember, error: memErr } = await db.from('members')
+    .insert({ display_name: name, role, password_hash: hash, is_registered: true })
+    .select().single();
+
+  if (memErr || !newMember) {
+    btn.disabled = false; btn.textContent = '登録する';
+    showAuthError('reg-error', '登録に失敗しました。もう一度お試しください');
+    return;
+  }
+
+  // 招待コードを使用済みにする
+  await db.from('invite_codes').update({ used: true, used_by: newMember.id }).eq('id', invite.id);
+
+  btn.disabled = false; btn.textContent = '登録する';
+
+  // 登録完了→自動ログイン
+  currentUser = {
+    id:           newMember.id,
+    display_name: newMember.display_name,
+    role:         newMember.role,
+    is_admin:     newMember.role === '隊長'
   };
   localStorage.setItem('kyukyu_user', JSON.stringify(currentUser));
   await startChat();
@@ -501,12 +587,10 @@ function logout() {
   localStorage.removeItem('kyukyu_user');
   currentUser = null; currentCase = null;
   stopRealtime();
-  document.getElementById('pw-input').value = '';
-  document.getElementById('step1').classList.remove('hidden');
-  document.getElementById('step2').classList.add('hidden');
-  document.getElementById('name-grid').innerHTML = '';
-  document.getElementById('enter-btn').disabled = true;
-  document.getElementById('admin-direct-wrap').classList.add('hidden');
+  document.getElementById('login-name').value = '';
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  switchTab('login');
   closeSidebar();
   showScreen('login');
 }
