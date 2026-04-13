@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>救急振り返りルーム</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -209,6 +210,9 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .btn-cancel{padding:11px 18px;font-size:14px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);min-height:46px}
 
 ::-webkit-scrollbar{width:3px;height:3px}
+.qr-btn{flex-shrink:0;font-size:11px;color:var(--blue);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
+.case-item:hover .qr-btn,.case-item.active .qr-btn{opacity:1}
+.qr-btn:active{color:var(--teal)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
@@ -449,12 +453,29 @@ textarea,input{-webkit-appearance:none;appearance:none}
   </div>
 </div>
 
+<!-- QRコードモーダル -->
+<div class="modal-overlay" id="modal-qr">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="qr-modal-title">QRコード</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:8px 0;">
+      <canvas id="qr-canvas" style="border-radius:var(--radius-sm);"></canvas>
+      <div id="qr-url" style="font-size:11px;color:var(--text3);word-break:break-all;text-align:center;max-width:280px;"></div>
+      <div style="display:flex;gap:8px;width:100%;">
+        <button class="btn-primary" style="background:var(--teal);" onclick="downloadQR()">画像を保存</button>
+        <button class="btn-cancel" style="flex:1;" onclick="document.getElementById('modal-qr').classList.remove('active')">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ================================================
    設定（自分のSupabase情報に書き換えてください）
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -471,6 +492,11 @@ let realtimeOk       = false;
 
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('kyukyu_user');
+  // URLパラメータで症例IDが指定されていれば保存
+  const urlParams = new URLSearchParams(window.location.search);
+  const caseIdFromUrl = urlParams.get('case');
+  if (caseIdFromUrl) sessionStorage.setItem('pending_case_id', caseIdFromUrl);
+
   if (saved) { currentUser = JSON.parse(saved); startChat(); }
   document.getElementById('login-pw').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
@@ -636,6 +662,13 @@ async function startChat() {
     currentUser.is_admin ? '管理者' : `${currentUser.display_name}（${currentUser.role}）`;
   document.getElementById('admin-btn').style.display = currentUser.is_admin ? '' : 'none';
   await loadCases();
+  // URLから指定された症例を自動で開く
+  const pendingId = sessionStorage.getItem('pending_case_id');
+  if (pendingId) {
+    sessionStorage.removeItem('pending_case_id');
+    const { data: c } = await db.from('cases').select('*').eq('id', pendingId).single();
+    if (c) selectCase(c);
+  }
 }
 
 function logout() {
@@ -669,12 +702,16 @@ async function loadCases() {
     const delBtn = currentUser && currentUser.is_admin
       ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>`
       : '';
+    const qrBtn = currentUser && currentUser.is_admin
+      ? `<button class="qr-btn" onclick="showQR(event,'${c.id}','${esc(c.title)}')" title="QRコード">QR</button>`
+      : '';
     const privateBadge = c.mode === 'private'
       ? `<span class="case-item-private">${currentUser && currentUser.is_admin ? '非公開' : '閲覧制限'}</span>` : '';
     el.innerHTML  = `
       <div class="case-item-row">
         <div class="case-item-title" style="flex:1;min-width:0;">${esc(c.title)}</div>
         ${privateBadge}
+        ${qrBtn}
         ${delBtn}
       </div>
       <div class="case-item-meta">${c.occurred_at||''}</div>`;
@@ -1173,6 +1210,29 @@ async function deleteInviteCode(id, code) {
 
 
 
+
+function showQR(event, caseId, caseTitle) {
+  event.stopPropagation();
+  const base = window.location.href.split('?')[0];
+  const url  = `${base}?case=${caseId}`;
+  document.getElementById('qr-modal-title').textContent = caseTitle;
+  document.getElementById('qr-url').textContent = url;
+  const canvas = document.getElementById('qr-canvas');
+  QRCode.toCanvas(canvas, url, {
+    width: 240, margin: 2,
+    color: { dark: '#1a1a18', light: '#ffffff' }
+  }, err => { if (err) console.error(err); });
+  document.getElementById('modal-qr').classList.add('active');
+}
+
+function downloadQR() {
+  const canvas = document.getElementById('qr-canvas');
+  const title  = document.getElementById('qr-modal-title').textContent;
+  const link   = document.createElement('a');
+  link.download = `QR_${title}.png`;
+  link.href     = canvas.toDataURL();
+  link.click();
+}
 
 async function changeSlide(delta) {
   if (!currentCase || !currentUser || !currentUser.is_admin) return;
