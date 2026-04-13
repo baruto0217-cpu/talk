@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>救急振り返りルーム</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -459,7 +459,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <div class="modal-handle"></div>
     <div class="modal-title" id="qr-modal-title">QRコード</div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:8px 0;">
-      <canvas id="qr-canvas" style="border-radius:var(--radius-sm);"></canvas>
+      <div id="qr-container" style="border-radius:var(--radius-sm);overflow:hidden;"></div>
       <div id="qr-url" style="font-size:11px;color:var(--text3);word-break:break-all;text-align:center;max-width:280px;"></div>
       <div style="display:flex;gap:8px;width:100%;">
         <button class="btn-primary" style="background:var(--teal);" onclick="downloadQR()">画像を保存</button>
@@ -1217,20 +1217,32 @@ function showQR(event, caseId, caseTitle) {
   const url  = `${base}?case=${caseId}`;
   document.getElementById('qr-modal-title').textContent = caseTitle;
   document.getElementById('qr-url').textContent = url;
-  const canvas = document.getElementById('qr-canvas');
-  QRCode.toCanvas(canvas, url, {
-    width: 240, margin: 2,
-    color: { dark: '#1a1a18', light: '#ffffff' }
-  }, err => { if (err) console.error(err); });
+  // QRコード描画エリアをリセット
+  const container = document.getElementById('qr-container');
+  container.innerHTML = '';
+  new QRCode(container, {
+    text:          url,
+    width:         240,
+    height:        240,
+    colorDark:     '#1a1a18',
+    colorLight:    '#ffffff',
+    correctLevel:  QRCode.CorrectLevel.H
+  });
   document.getElementById('modal-qr').classList.add('active');
 }
 
 function downloadQR() {
-  const canvas = document.getElementById('qr-canvas');
-  const title  = document.getElementById('qr-modal-title').textContent;
-  const link   = document.createElement('a');
+  const container = document.getElementById('qr-container');
+  const img = container.querySelector('img');
+  const canvas = container.querySelector('canvas');
+  const title = document.getElementById('qr-modal-title').textContent;
+  const link = document.createElement('a');
   link.download = `QR_${title}.png`;
-  link.href     = canvas.toDataURL();
+  if (canvas) {
+    link.href = canvas.toDataURL();
+  } else if (img) {
+    link.href = img.src;
+  }
   link.click();
 }
 
