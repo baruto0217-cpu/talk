@@ -396,7 +396,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
-
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -529,11 +528,11 @@ async function doRegister() {
 
   // 招待コード確認
   const { data: invite, error: invErr } = await db.from('invite_codes')
-    .select('*').eq('code', code).eq('used', false).single();
+    .select('*').eq('code', code).single();
 
   if (invErr || !invite) {
     btn.disabled = false; btn.textContent = '登録する';
-    showAuthError('reg-error', '招待コードが無効または使用済みです');
+    showAuthError('reg-error', '招待コードが無効です');
     return;
   }
 
@@ -558,9 +557,6 @@ async function doRegister() {
     showAuthError('reg-error', '登録に失敗しました。もう一度お試しください');
     return;
   }
-
-  // 招待コードを使用済みにする
-  await db.from('invite_codes').update({ used: true, used_by: newMember.id }).eq('id', invite.id);
 
   btn.disabled = false; btn.textContent = '登録する';
 
