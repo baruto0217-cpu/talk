@@ -414,7 +414,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:var(--surface2);">
             <input type="radio" name="case-mode" value="private" style="accent-color:var(--amber);width:16px;height:16px;">
             <span style="font-size:13px;font-weight:500;">非公開</span>
-            <span style="font-size:11px;color:var(--text3);">管理者のみ</span>
+            <span style="font-size:11px;color:var(--text3);">自分の投稿のみ閲覧可</span>
           </label>
         </div>
       </div>
@@ -640,8 +640,7 @@ async function loadCases() {
     return;
   }
   data.forEach(c => {
-    // 非公開症例は管理者のみ表示
-    if (c.mode === 'private' && currentUser && !currentUser.is_admin) return;
+    // 非公開症例も一覧には表示（コメントは自分のものだけ見える）
     const el = document.createElement('div');
     el.className  = 'case-item';
     el.dataset.id = c.id;
@@ -649,7 +648,7 @@ async function loadCases() {
       ? `<button class="case-del-btn" onclick="deleteCase(event,'${c.id}','${esc(c.title)}')">✕</button>`
       : '';
     const privateBadge = c.mode === 'private'
-      ? `<span class="case-item-private">非公開</span>` : '';
+      ? `<span class="case-item-private">${currentUser && currentUser.is_admin ? '非公開' : '閲覧制限'}</span>` : '';
     el.innerHTML  = `
       <div class="case-item-row">
         <div class="case-item-title" style="flex:1;min-width:0;">${esc(c.title)}</div>
