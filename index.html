@@ -533,7 +533,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
-
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -726,7 +725,45 @@ async function startChat() {
     window._casesChannel = db.channel('cases-global')
       .on('postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'cases' },
-        async () => { await loadCases(); }
+        async payload => {
+          await loadCases();
+          if (!currentCase || !payload.new || payload.new.id !== currentCase.id) return;
+          const n   = payload.new;
+          const isAdmin = currentUser && currentUser.is_admin;
+          if (isAdmin) return;
+
+          const wasLocked = currentCase.is_locked;
+          const wasHidden = currentCase.is_hidden;
+          currentCase.is_locked = n.is_locked;
+          currentCase.is_hidden  = n.is_hidden;
+
+          // 非表示になった → チャットを閉じる
+          if (n.is_hidden && !wasHidden) {
+            currentCase = null;
+            stopRealtime();
+            document.getElementById('case-header').classList.remove('visible');
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('mobile-header-title').textContent = '症例を選択してください';
+            document.getElementById('messages').innerHTML =
+              '<div class="no-case">この症例は現在非表示になりました</div>';
+            return;
+          }
+          // ロックされた
+          if (n.is_locked && !wasLocked) {
+            document.getElementById('input-area').style.display = 'none';
+            const msgs = document.getElementById('messages');
+            if (msgs && !msgs.querySelector('.lock-notice')) {
+              msgs.insertAdjacentHTML('afterbegin',
+                '<div class="lock-notice" style="font-size:12px;color:var(--amber);background:var(--amber-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:8px;border:0.5px solid #fac775;">この症例はロックされました</div>');
+            }
+          }
+          // ロック解除
+          if (!n.is_locked && wasLocked) {
+            document.getElementById('input-area').style.display = '';
+            const notice = document.querySelector('.lock-notice');
+            if (notice) notice.remove();
+          }
+        }
       )
       .subscribe();
   }
@@ -1175,7 +1212,6 @@ function subscribeRealtime() {
         realtimeOk = true; updateRealtimeIndicator();
         if (!payload.new) return;
         const n = payload.new;
-
         // スライド番号更新
         currentCase.current_slide = n.current_slide;
         currentCase.total_slides  = n.total_slides;
@@ -1183,42 +1219,6 @@ function subscribeRealtime() {
         const tl = document.getElementById('slide-total');
         if (el) el.textContent = n.current_slide || 1;
         if (tl) tl.textContent = '/ ' + (n.total_slides || 1);
-
-        // ロック・非表示の変更
-        const wasLocked = currentCase.is_locked;
-        const wasHidden = currentCase.is_hidden;
-        currentCase.is_locked = n.is_locked;
-        currentCase.is_hidden  = n.is_hidden;
-
-        // 参加者に対してロック・非表示が変わった場合の処理
-        if (!currentUser.is_admin) {
-          // 非表示になった → チャットを閉じる
-          if (n.is_hidden && !wasHidden) {
-            currentCase = null;
-            stopRealtime();
-            document.getElementById('case-header').classList.remove('visible');
-            document.getElementById('input-area').style.display = 'none';
-            document.getElementById('mobile-header-title').textContent = '症例を選択してください';
-            document.getElementById('messages').innerHTML =
-              '<div class="no-case">この症例は現在非表示になりました</div>';
-            await loadCases();
-            return;
-          }
-          // ロックされた → 投稿エリアを無効化
-          if (n.is_locked && !wasLocked) {
-            document.getElementById('input-area').style.display = 'none';
-            document.getElementById('messages').insertAdjacentHTML('afterbegin',
-              '<div style="font-size:12px;color:var(--amber);background:var(--amber-bg);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:8px;border:0.5px solid #fac775;">この症例はロックされました</div>');
-          }
-          // ロック解除 → 投稿エリアを再表示
-          if (!n.is_locked && wasLocked) {
-            document.getElementById('input-area').style.display = '';
-            const notice = document.querySelector('.lock-notice');
-            if (notice) notice.remove();
-          }
-        }
-        // 症例一覧を更新
-        await loadCases();
       }
     )
     .subscribe(status => {
