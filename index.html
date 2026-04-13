@@ -357,13 +357,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
     </div>
     <div class="quiz-banner" id="quiz-banner">
       <div class="quiz-question" id="quiz-banner-question"></div>
-      <div class="quiz-timer" id="quiz-banner-timer"></div>
-      <div id="quiz-answer-area">
-        <div class="quiz-answer-row">
-          <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea>
-          <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button>
-        </div>
-      </div>
+      <div class="quiz-timer" id="quiz-banner-timer" style="display:none;"></div>
+      <div id="quiz-answer-area"></div>
     </div>
     <div class="messages" id="messages">
       <div class="no-case">☰ メニューから症例を選択してください</div>
@@ -406,8 +401,20 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <div class="dash-card" id="quiz-dashboard">
       <div class="dash-card-title">問題管理ダッシュボード</div>
       <div style="font-size:12px;color:var(--text3);" id="quiz-case-label">症例を選択してください</div>
-      <div id="quiz-create-area" style="display:none;flex-direction:column;gap:8px;">
+      <div id="quiz-create-area" style="display:none;flex-direction:column;gap:10px;">
         <textarea class="msg-ta" id="quiz-question-input" style="height:64px;" placeholder="問題文を入力..."></textarea>
+        <div style="display:flex;gap:8px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="quiz-type" value="text" checked onchange="toggleChoicesInput()" style="accent-color:var(--teal);width:15px;height:15px;">記述式
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="quiz-type" value="choice" onchange="toggleChoicesInput()" style="accent-color:var(--blue);width:15px;height:15px;">選択肢式
+          </label>
+        </div>
+        <div id="choices-input-area" style="display:none;flex-direction:column;gap:6px;">
+          <div style="font-size:11px;color:var(--text3);">選択肢（1行1つ・2〜6個）</div>
+          <textarea class="msg-ta" id="quiz-choices-input" style="height:90px;" placeholder="例：&#10;はい&#10;いいえ&#10;わからない"></textarea>
+        </div>
         <button class="admin-add-btn" onclick="createQuiz()">問題を作成</button>
       </div>
       <div id="quiz-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -518,6 +525,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -1371,6 +1379,8 @@ async function loadQuizDashboard() {
           <span class="quiz-answer-text">${esc(a.answer)}</span>
         </div>`).join('')
       : '<div style="font-size:12px;color:var(--text3);padding:4px 0;">まだ回答がありません</div>';
+    const typeLabel = q.quiz_type === 'choice' ? '選択肢式' : '記述式';
+    const typeBadge = `<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);border:0.5px solid var(--border2);">${typeLabel}</span>`;
     const avgHTML = avg != null ? `<div class="quiz-avg">平均回答時間: ${avg}秒 （${answers.length}名回答）</div>` : '';
     const startBtn = q.status === 'draft'
       ? `<button onclick="startQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;cursor:pointer;font-family:inherit;">開始</button>` : '';
@@ -1383,6 +1393,7 @@ async function loadQuizDashboard() {
     row.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="quiz-status-badge ${statusCls}">${statusLabel}</span>
+        ${typeBadge}
         <span class="quiz-row-q">${esc(q.question)}</span>
         <div style="margin-left:auto;display:flex;gap:6px;">${startBtn}${closeBtn}${delBtn}</div>
       </div>
@@ -1392,15 +1403,32 @@ async function loadQuizDashboard() {
   }
 }
 
+function toggleChoicesInput() {
+  const type = document.querySelector('input[name="quiz-type"]:checked')?.value;
+  const area = document.getElementById('choices-input-area');
+  if (area) area.style.display = type === 'choice' ? 'flex' : 'none';
+}
+
 async function createQuiz() {
-  const q = document.getElementById('quiz-question-input').value.trim();
+  const q    = document.getElementById('quiz-question-input').value.trim();
+  const type = document.querySelector('input[name="quiz-type"]:checked')?.value || 'text';
   if (!q || !currentCase) return;
+  let choices = null;
+  if (type === 'choice') {
+    const raw = document.getElementById('quiz-choices-input').value;
+    choices = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    if (choices.length < 2) { alert('選択肢を2つ以上入力してください'); return; }
+    if (choices.length > 6) { alert('選択肢は6つまでです'); return; }
+  }
   const { error } = await db.from('quizzes').insert({
-    case_id: currentCase.id, question: q,
+    case_id: currentCase.id, question: q, quiz_type: type,
+    choices: choices ? JSON.stringify(choices) : null,
     status: 'draft', created_by: currentUser.display_name
   });
   if (!error) {
     document.getElementById('quiz-question-input').value = '';
+    if (document.getElementById('quiz-choices-input'))
+      document.getElementById('quiz-choices-input').value = '';
     await loadQuizDashboard();
   } else alert('作成に失敗しました');
 }
@@ -1440,32 +1468,61 @@ function showQuizBanner(quiz) {
   currentQuizId = quiz.id;
   document.getElementById('quiz-banner-question').textContent = quiz.question;
   document.getElementById('quiz-banner').classList.add('active');
-  // 既回答チェック
+
   const answeredKey = 'quiz_answered_' + quiz.id;
+  const area = document.getElementById('quiz-answer-area');
+
   if (localStorage.getItem(answeredKey)) {
-    document.getElementById('quiz-answer-area').innerHTML =
-      '<div class="quiz-submitted">回答済みです</div>';
+    area.innerHTML = '<div class="quiz-submitted">回答済みです</div>';
+  } else if (quiz.quiz_type === 'choice' && quiz.choices) {
+    // 選択肢式
+    const choices = typeof quiz.choices === 'string' ? JSON.parse(quiz.choices) : quiz.choices;
+    const btns = choices.map((c, i) =>
+      `<button class="choice-btn" onclick="submitChoiceAnswer('${quiz.id}', ${i}, this)"
+        style="width:100%;padding:12px;font-size:14px;text-align:left;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:6px;transition:background .12s;"
+        onmouseover="this.style.background='var(--blue-bg)'" onmouseout="this.style.background='var(--surface)'">
+        ${esc(c)}
+      </button>`
+    ).join('');
+    area.innerHTML = `<div style="display:flex;flex-direction:column;gap:0;">${btns}</div>`;
   } else {
-    document.getElementById('quiz-answer-area').innerHTML = `
+    // 記述式
+    area.innerHTML = `
       <div class="quiz-answer-row">
         <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea>
         <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button>
       </div>`;
   }
-  // タイマー表示
+
+  // タイマーは内部計測のみ（表示しない）
   if (quizTimerInterval) clearInterval(quizTimerInterval);
-  const startedAt = new Date(quiz.started_at).getTime();
-  quizTimerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-    const el = document.getElementById('quiz-banner-timer');
-    if (el) el.textContent = `経過時間: ${elapsed}秒`;
-  }, 1000);
 }
 
 function hideQuizBanner() {
   currentQuizId = null;
   document.getElementById('quiz-banner').classList.remove('active');
   if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
+}
+
+async function submitChoiceAnswer(quizId, choiceIndex, btnEl) {
+  // 全ボタン無効化
+  btnEl.closest('div').querySelectorAll('button').forEach(b => b.disabled = true);
+  const { data: quiz } = await db.from('quizzes').select('started_at,choices').eq('id', quizId).single();
+  const choices = quiz && quiz.choices ? (typeof quiz.choices === 'string' ? JSON.parse(quiz.choices) : quiz.choices) : [];
+  const answer  = choices[choiceIndex] || '';
+  const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
+  const { error } = await db.from('quiz_answers').insert({
+    quiz_id: quizId, member_id: currentUser.id !== 'admin' ? currentUser.id : null,
+    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
+    answer, elapsed_seconds: elapsed
+  });
+  if (!error) {
+    localStorage.setItem('quiz_answered_' + quizId, '1');
+    document.getElementById('quiz-answer-area').innerHTML = '<div class="quiz-submitted">回答しました！</div>';
+  } else {
+    btnEl.closest('div').querySelectorAll('button').forEach(b => b.disabled = false);
+    alert('送信に失敗しました');
+  }
 }
 
 async function submitQuizAnswer() {
