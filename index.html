@@ -533,6 +533,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 ================================================ */
 const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
@@ -899,9 +900,9 @@ async function selectCase(c) {
   const toggleBtn = document.getElementById('case-mode-toggle');
   if (currentUser && currentUser.is_admin) toggleBtn.classList.remove('hidden');
   else toggleBtn.classList.add('hidden');
-  // スライドコントロール更新（管理者かつ非公開症例のみ表示）
+  // スライドコントロール更新（管理者であれば公開・非公開問わず表示）
   const slideCtrl = document.getElementById('slide-ctrl');
-  if (currentUser && currentUser.is_admin && c.mode === 'private') {
+  if (currentUser && currentUser.is_admin) {
     slideCtrl.classList.add('visible');
     const cur = c.current_slide || 1;
     const tot = c.total_slides  || 1;
@@ -926,16 +927,11 @@ function openNewCaseModal() {
   document.getElementById('case-date').value = new Date().toISOString().split('T')[0];
   // 管理者のみモード選択を表示
   document.getElementById('case-mode-field').style.display = currentUser && currentUser.is_admin ? '' : 'none';
-  document.getElementById('case-slides-field').style.display = 'none';
+  // スライド枚数入力は管理者なら常に表示
+  const slidesField = document.getElementById('case-slides-field');
+  if (slidesField) slidesField.style.display = currentUser && currentUser.is_admin ? '' : 'none';
   // デフォルトを掲示板に戻す
   document.querySelector('input[name="case-mode"][value="public"]').checked = true;
-  // モード変更時にスライド入力を表示/非表示
-  document.querySelectorAll('input[name="case-mode"]').forEach(r => {
-    r.onchange = () => {
-      document.getElementById('case-slides-field').style.display =
-        r.value === 'private' ? '' : 'none';
-    };
-  });
   document.getElementById('modal-new-case').classList.add('active');
 }
 function closeNewCaseModal() {
