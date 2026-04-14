@@ -983,6 +983,15 @@ async function loadMessages() {
   const container = document.getElementById('messages');
   const atBottom  = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
 
+  // 入力中のリプライ情報を保存
+  const activeReply = container.querySelector('.reply-input-box');
+  const activeParentId = activeReply
+    ? activeReply.closest('.msg')?.dataset.id : null;
+  const activeText = activeReply
+    ? (activeReply.querySelector('textarea')?.value || '') : '';
+  const activeToName = activeReply
+    ? (activeReply.querySelector('.reply-quote span')?.textContent?.replace('へのリプライ','') || '') : '';
+
   container.innerHTML = '';
   const parents  = (data || []).filter(m => !m.parent_id);
   const children = (data || []).filter(m =>  m.parent_id);
@@ -1002,6 +1011,13 @@ async function loadMessages() {
     container.appendChild(buildMsgEl(msg, children.filter(r => r.parent_id === msg.id)));
   });
   if (atBottom) container.scrollTop = container.scrollHeight;
+
+  // 入力中だったリプライ欄を復元
+  if (activeParentId && activeToName) {
+    openReplyInput(activeParentId, activeToName);
+    const ta = container.querySelector('.reply-input-box textarea');
+    if (ta && activeText) { ta.value = activeText; ta.focus(); }
+  }
 }
 
 function buildMsgEl(msg, replies) {
@@ -1129,10 +1145,17 @@ async function sendReply(btn, parentId) {
     display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
     role:         currentUser.is_admin ? '管理者' : currentUser.role,
     body, tag: null,
-    is_anonymous: document.getElementById('anon-check').checked
+    is_anonymous: document.getElementById('anon-check').checked,
+    slide_no:     null
   });
-  if (!error) btn.closest('.reply-input-box').remove();
-  else { btn.disabled = false; alert('送信に失敗しました'); }
+  if (!error) {
+    btn.closest('.reply-input-box').remove();
+    await loadMessages();
+  } else {
+    console.error('sendReply error:', error);
+    btn.disabled = false;
+    alert('送信に失敗しました: ' + (error.message || JSON.stringify(error)));
+  }
 }
 
 /* ================================================
