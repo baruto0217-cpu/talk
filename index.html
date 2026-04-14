@@ -545,7 +545,7 @@ let realtimeChannel = null;
 let pollingTimer     = null;
 let realtimeOk       = false;
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   // supabaseライブラリ読み込み後にdbを初期化
   const { createClient } = supabase;
   db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -614,6 +614,11 @@ function clearAuthError(id) {
    ログイン
 ================================================ */
 async function doLogin() {
+  // dbが未初期化の場合は初期化
+  if (!db) {
+    const { createClient } = supabase;
+    db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
   clearAuthError('login-error');
   const name = document.getElementById('login-name').value.trim();
   const pw   = document.getElementById('login-pw').value;
@@ -654,6 +659,10 @@ async function doLogin() {
    新規登録
 ================================================ */
 async function doRegister() {
+  if (!db) {
+    const { createClient } = supabase;
+    db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
   clearAuthError('reg-error');
   const code  = document.getElementById('reg-code').value.trim().toUpperCase();
   const name  = document.getElementById('reg-name').value.trim();
@@ -1274,7 +1283,10 @@ function subscribeRealtime() {
 
   // ポーリング（5秒ごと）— Realtime の補完
   pollingTimer = setInterval(() => {
-    if (currentCase) loadMessages();
+    if (currentCase) {
+      loadMessages();
+      loadActiveQuiz();
+    }
   }, 5000);
 }
 
