@@ -438,7 +438,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
     <div class="admin-panel">
       <div class="admin-panel-header">登録隊員一覧</div>
       <table class="member-table">
-        <thead><tr><th>氏名</th><th>役職</th><th style="width:50px;"></th></tr></thead>
+        <thead><tr><th>氏名</th><th>役職</th><th style="width:70px;">PW</th><th style="width:50px;"></th></tr></thead>
         <tbody id="admin-member-tbody"></tbody>
       </table>
     </div>
@@ -529,7 +529,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
 /* ================================================
    設定（自分のSupabase情報に書き換えてください）
 ================================================ */
-const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
 
 /* ================================================
@@ -1130,7 +1129,15 @@ function openReplyInput(parentId, toName) {
       <button class="reply-send-btn" onclick="sendReply(this,'${parentId}')">送信</button>
     </div>`;
   (wrap || msgEl.querySelector('.msg-actions')).after(box);
-  box.querySelector('textarea').focus();
+  const ta = box.querySelector('textarea');
+  const sendBtn = box.querySelector('.reply-send-btn');
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      sendReply(sendBtn, parentId);
+    }
+  });
+  ta.focus();
   if (wrap) wrap.style.maxHeight = wrap.scrollHeight + 200 + 'px';
 }
 
@@ -1316,6 +1323,7 @@ async function loadAdminMembers() {
           ${opts}
         </select>
       </td>
+      <td><button style="font-size:11px;color:var(--blue);background:none;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:4px 6px;cursor:pointer;font-family:inherit;" onclick="resetPassword('${m.id}','${esc(m.display_name)}')">PW</button></td>
       <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
     tbody.appendChild(tr);
   });
@@ -1326,6 +1334,27 @@ async function updateMemberRole(id, newRole) {
   if (error) {
     alert('役職の変更に失敗しました。RLSの設定を確認してください。');
     await loadAdminMembers();
+  }
+}
+
+async function resetPassword(memberId, memberName) {
+  const newPw = prompt(`${memberName} の新しいパスワードを入力してください（6文字以上）:`);
+  if (!newPw) return;
+  if (newPw.length < 6) { alert('パスワードは6文字以上にしてください'); return; }
+
+  // SHA-256ハッシュを生成
+  const buf  = new TextEncoder().encode(newPw);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  const hex  = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+  const { error } = await db.from('members').update({ password_hash: hex }).eq('id', memberId);
+  if (!error) {
+    alert(`${memberName} のパスワードをリセットしました。
+新しいパスワード: ${newPw}
+
+本人に直接お伝えください。`);
+  } else {
+    alert('リセットに失敗しました: ' + (error.message || ''));
   }
 }
 
