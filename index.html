@@ -453,22 +453,6 @@ textarea,input{-webkit-appearance:none;appearance:none}
       <div class="success-msg" id="invite-success">発行しました</div>
     </div>
 
-    <div class="admin-card">
-      <div class="admin-card-title">隊員を追加</div>
-      <div class="admin-field">
-        <label>氏名</label>
-        <input class="field-input" type="text" id="new-member-name" placeholder="例：伊藤 健">
-      </div>
-      <div class="admin-field">
-        <label>役職</label>
-        <select id="new-member-role">
-          <option>管理者</option><option>隊長</option><option>救命士</option><option selected>隊員</option>
-        </select>
-      </div>
-      <button class="admin-add-btn" onclick="addMember()">追加する</button>
-      <div class="success-msg" id="member-success">追加しました</div>
-      <div class="error-msg" id="member-error" style="display:none;">追加に失敗しました。RLSの設定を確認してください。</div>
-    </div>
 
   </div>
 </div>
@@ -1577,7 +1561,14 @@ async function closeQuiz(quizId) {
 
 async function deleteQuiz(quizId) {
   if (!confirm('この問題を削除しますか?')) return;
-  await db.from('quizzes').delete().eq('id', quizId);
+  const { error } = await db.from('quizzes').delete().eq('id', quizId);
+  if (error) {
+    const msg = error.message && error.message.includes('row-level security')
+      ? '削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists "quizzes_delete" on quizzes;\ncreate policy "quizzes_delete" on quizzes for delete using (true);'
+      : '削除に失敗しました: ' + (error.message || '');
+    alert(msg);
+    return;
+  }
   await loadQuizDashboard();
 }
 
