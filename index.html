@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>救急振り返りルーム</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.39.3/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -535,8 +535,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
 ================================================ */
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let db = null;
 
 let currentUser     = null;
 let currentCase     = null;
@@ -547,6 +546,10 @@ let pollingTimer     = null;
 let realtimeOk       = false;
 
 window.addEventListener('DOMContentLoaded', () => {
+  // supabaseライブラリ読み込み後にdbを初期化
+  const { createClient } = supabase;
+  db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const saved = localStorage.getItem('kyukyu_user');
   // URLパラメータで症例IDが指定されていれば保存
   const urlParams = new URLSearchParams(window.location.search);
