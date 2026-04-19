@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -28,24 +29,24 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .screen.active{display:flex}
 
 /* ログイン */
-#screen-login{min-height:100dvh;align-items:center;justify-content:center;background:var(--bg);padding:1rem}
-.login-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:2rem 1.6rem;width:100%;max-width:380px}
-.login-logo{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:3px}
-.login-sub{font-size:12px;color:var(--text3);margin-bottom:1.6rem}
+#screen-login{min-height:100dvh;align-items:center;justify-content:center;background:var(–bg);padding:1rem}
+.login-card{background:var(–surface);border:0.5px solid var(–border2);border-radius:var(–radius);padding:2rem 1.6rem;width:100%;max-width:380px}
+.login-logo{font-size:20px;font-weight:700;color:var(–text);letter-spacing:-.5px;margin-bottom:3px}
+.login-sub{font-size:12px;color:var(–text3);margin-bottom:1.6rem}
 .login-step{display:flex;flex-direction:column;gap:14px}
 .login-step.hidden{display:none}
-.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.field-input{width:100%;font-size:16px;padding:12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;transition:border-color .15s}
-.field-input:focus{outline:none;border-color:var(--teal)}
-.btn-primary{width:100%;padding:13px;font-size:15px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:#fff;transition:opacity .15s;min-height:48px}
+.field-label{font-size:11px;font-weight:600;color:var(–text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.field-input{width:100%;font-size:16px;padding:12px;border:0.5px solid var(–border2);border-radius:var(–radius-sm);background:var(–surface);color:var(–text);font-family:inherit;transition:border-color .15s}
+.field-input:focus{outline:none;border-color:var(–teal)}
+.btn-primary{width:100%;padding:13px;font-size:15px;font-weight:600;border:none;border-radius:var(–radius-sm);background:var(–text);color:#fff;transition:opacity .15s;min-height:48px}
 .btn-primary:active{opacity:.75}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.error-msg{font-size:12px;color:var(--red);background:var(--red-bg);border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:8px 10px;display:none}
+.error-msg{font-size:12px;color:var(–red);background:var(–red-bg);border:0.5px solid #f09595;border-radius:var(–radius-sm);padding:8px 10px;display:none}
 .name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto}
-.name-btn{padding:12px 8px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);text-align:center;transition:all .12s;min-height:52px}
-.name-btn.selected{border:2px solid var(--teal);background:var(--teal-bg);color:var(--teal);font-weight:600}
-.name-role{font-size:10px;color:var(--text3);margin-top:2px}
-.name-btn.selected .name-role{color:var(--teal)}
+.name-btn{padding:12px 8px;font-size:13px;border:0.5px solid var(–border);border-radius:var(–radius-sm);background:var(–surface2);color:var(–text);text-align:center;transition:all .12s;min-height:52px}
+.name-btn.selected{border:2px solid var(–teal);background:var(–teal-bg);color:var(–teal);font-weight:600}
+.name-role{font-size:10px;color:var(–text3);margin-top:2px}
+.name-btn.selected .name-role{color:var(–teal)}
 
 /* チャット画面 */
 #screen-chat{height:100dvh;flex-direction:column}
@@ -55,262 +56,268 @@ textarea,input{-webkit-appearance:none;appearance:none}
 .sidebar-overlay.open{display:block}
 
 /* サイドバー */
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--surface);display:flex;flex-direction:column;z-index:51;transform:translateX(-100%);transition:transform .25s ease;border-right:0.5px solid var(--border2)}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(–surface);display:flex;flex-direction:column;z-index:51;transform:translateX(-100%);transition:transform .25s ease;border-right:0.5px solid var(–border2)}
 .sidebar.open{transform:translateX(0)}
-.sidebar-header{padding:16px 14px 12px;border-bottom:0.5px solid var(--border)}
-.sidebar-title{font-size:14px;font-weight:700;color:var(--text)}
-.sidebar-user{font-size:11px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:5px}
-.sidebar-user-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
-.sidebar-section-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px 4px}
+.sidebar-header{padding:16px 14px 12px;border-bottom:0.5px solid var(–border)}
+.sidebar-title{font-size:14px;font-weight:700;color:var(–text)}
+.sidebar-user{font-size:11px;color:var(–text3);margin-top:3px;display:flex;align-items:center;gap:5px}
+.sidebar-user-dot{width:6px;height:6px;border-radius:50%;background:var(–teal);flex-shrink:0}
+.sidebar-section-label{font-size:10px;font-weight:700;color:var(–text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px 4px}
 .case-list{flex:1;overflow-y:auto;padding:4px 8px}
-.case-item{padding:10px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:2px;border:0.5px solid transparent;transition:all .12s}
-.case-item:active{background:var(--surface2)}
-.case-item.active{background:var(--teal-bg);border-color:var(--teal-bd)}
-.case-item-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.case-item.active .case-item-title{color:var(--teal)}
-.case-item-meta{font-size:11px;color:var(--text3);margin-top:1px}
+.case-item{padding:10px;border-radius:var(–radius-sm);cursor:pointer;margin-bottom:2px;border:0.5px solid transparent;transition:all .12s}
+.case-item:active{background:var(–surface2)}
+.case-item.active{background:var(–teal-bg);border-color:var(–teal-bd)}
+.case-item-title{font-size:13px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.case-item.active .case-item-title{color:var(–teal)}
+.case-item-meta{font-size:11px;color:var(–text3);margin-top:1px}
 .case-item-row{display:flex;align-items:center;gap:6px}
-.case-del-btn{flex-shrink:0;font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
+.case-del-btn{flex-shrink:0;font-size:11px;color:var(–text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
 .case-item:hover .case-del-btn,.case-item.active .case-del-btn{opacity:1}
-.case-del-btn:active{color:var(--red)}
-.case-lock-btn,.case-hide-btn{flex-shrink:0;font-size:10px;color:var(--text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s;cursor:pointer;}
+.case-del-btn:active{color:var(–red)}
+.case-lock-btn,.case-hide-btn{flex-shrink:0;font-size:10px;color:var(–text3);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s;cursor:pointer;}
 .case-item:hover .case-lock-btn,.case-item.active .case-lock-btn,.case-item:hover .case-hide-btn,.case-item.active .case-hide-btn{opacity:1}
-.case-lock-btn.on{color:var(--amber);opacity:1}
-.case-hide-btn.on{color:var(--red);opacity:1}
-.case-item.locked .case-item-title{color:var(--text3)}
+.case-lock-btn.on{color:var(–amber);opacity:1}
+.case-hide-btn.on{color:var(–red);opacity:1}
+.case-item.locked .case-item-title{color:var(–text3)}
 .case-item.hidden-case{opacity:.5}
-.case-locked-badge{font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
-.case-hidden-badge{font-size:9px;font-weight:700;color:var(--red);background:var(--red-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
-.sidebar-footer{padding:8px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:5px}
-.sidebar-btn{width:100%;padding:12px;font-size:13px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text2);text-align:left;transition:background .12s;min-height:44px}
-.sidebar-btn:active{background:var(--surface2)}
-.sidebar-btn.admin{color:var(--amber);border-color:#fac775}
+.case-locked-badge{font-size:9px;font-weight:700;color:var(–amber);background:var(–amber-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
+.case-hidden-badge{font-size:9px;font-weight:700;color:var(–red);background:var(–red-bg);border-radius:3px;padding:1px 5px;flex-shrink:0}
+.sidebar-footer{padding:8px;border-top:0.5px solid var(–border);display:flex;flex-direction:column;gap:5px}
+.sidebar-btn{width:100%;padding:12px;font-size:13px;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:transparent;color:var(–text2);text-align:left;transition:background .12s;min-height:44px}
+.sidebar-btn:active{background:var(–surface2)}
+.sidebar-btn.admin{color:var(–amber);border-color:#fac775}
 
 /* チャット本体 */
 .chat-body{flex:1;display:flex;flex-direction:column;min-height:0}
-.mobile-header{height:52px;background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
-.mobile-header-title{font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hamburger-btn{width:40px;height:40px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.mobile-header{height:52px;background:var(–surface);border-bottom:0.5px solid var(–border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
+.mobile-header-title{font-size:14px;font-weight:700;color:var(–text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hamburger-btn{width:40px;height:40px;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:var(–surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
 #realtime-indicator{width:8px;height:8px;border-radius:50%;background:#9a9a94;flex-shrink:0;transition:background .4s;}
 
-.case-header{padding:10px 14px;border-bottom:0.5px solid var(--border);background:var(--surface);display:none}
+.case-header{padding:10px 14px;border-bottom:0.5px solid var(–border);background:var(–surface);display:none}
 .mode-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:99px;flex-shrink:0}
-.mode-public{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
-.mode-private{background:var(--amber-bg);color:var(--amber);border:0.5px solid #fac775}
+.mode-public{background:var(–teal-bg);color:var(–teal);border:0.5px solid var(–teal-bd)}
+.mode-private{background:var(–amber-bg);color:var(–amber);border:0.5px solid #fac775}
 .case-header-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.slide-ctrl{display:none;align-items:center;gap:6px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;margin-top:6px}
+.slide-ctrl{display:none;align-items:center;gap:6px;background:var(–surface2);border:0.5px solid var(–border2);border-radius:var(–radius-sm);padding:5px 10px;margin-top:6px}
 .slide-ctrl.visible{display:flex}
-.slide-ctrl-label{font-size:12px;font-weight:600;color:var(--text2);min-width:70px}
-.slide-ctrl-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.slide-ctrl-btn:active{background:var(--surface2)}
-.slide-ctrl-num{font-size:13px;font-weight:600;color:var(--text);min-width:50px;text-align:center}
-.slide-ctrl-total{font-size:12px;color:var(--text3)}
-.slide-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);margin-right:4px;flex-shrink:0}
-.mode-toggle-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:2px 4px;cursor:pointer;flex-shrink:0}
-.case-item-private{font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:3px;padding:1px 4px;flex-shrink:0}
+.slide-ctrl-label{font-size:12px;font-weight:600;color:var(–text2);min-width:70px}
+.slide-ctrl-btn{width:28px;height:28px;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:var(–surface);font-size:14px;font-weight:600;color:var(–text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.slide-ctrl-btn:active{background:var(–surface2)}
+.slide-ctrl-num{font-size:13px;font-weight:600;color:var(–text);min-width:50px;text-align:center}
+.slide-ctrl-total{font-size:12px;color:var(–text3)}
+.slide-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(–blue-bg);color:var(–blue);border:0.5px solid var(–blue-bd);margin-right:4px;flex-shrink:0}
+.mode-toggle-btn{font-size:11px;color:var(–text3);background:none;border:none;padding:2px 4px;cursor:pointer;flex-shrink:0}
+.case-item-private{font-size:9px;font-weight:700;color:var(–amber);background:var(–amber-bg);border-radius:3px;padding:1px 4px;flex-shrink:0}
 .case-header.visible{display:block}
-.case-header-title{font-size:14px;font-weight:700;color:var(--text)}
-.case-header-sub{font-size:11px;color:var(--text3);margin-top:1px;margin-bottom:8px}
+.case-header-title{font-size:14px;font-weight:700;color:var(–text)}
+.case-header-sub{font-size:11px;color:var(–text3);margin-top:1px;margin-bottom:8px}
 .tag-filters{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px}
 .tag-filters::-webkit-scrollbar{display:none}
-.tag-filter-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);white-space:nowrap;transition:all .12s;flex-shrink:0;min-height:30px}
-.tag-filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.tag-filter-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(–border2);background:var(–surface2);color:var(–text2);white-space:nowrap;transition:all .12s;flex-shrink:0;min-height:30px}
+.tag-filter-btn.active{background:var(–text);color:#fff;border-color:var(–text)}
 
 .messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch}
-.no-case{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;text-align:center;padding:2rem}
+.no-case{display:flex;align-items:center;justify-content:center;height:100%;color:var(–text3);font-size:13px;text-align:center;padding:2rem}
 
 .msg{display:flex;flex-direction:column;gap:4px}
 .msg-header{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--surface2);border:0.5px solid var(--border2);color:var(--text2)}
-.msg-name{font-size:12px;font-weight:600;color:var(--text2)}
-.msg-time{font-size:10px;color:var(--text3)}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(–surface2);border:0.5px solid var(–border2);color:var(–text2)}
+.msg-name{font-size:12px;font-weight:600;color:var(–text2)}
+.msg-time{font-size:10px;color:var(–text3)}
 .tag-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
-.tag-good{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
-.tag-imp{background:var(--coral-bg);color:var(--coral);border:0.5px solid var(--coral-bd)}
-.tag-q{background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd)}
-.msg-body{font-size:13px;color:var(--text);line-height:1.65;margin-left:35px;background:var(--surface2);padding:9px 12px;border-radius:0 var(--radius-sm) var(--radius-sm) var(--radius-sm);border:0.5px solid var(--border);word-break:break-word}
+.tag-good{background:var(–teal-bg);color:var(–teal);border:0.5px solid var(–teal-bd)}
+.tag-imp{background:var(–coral-bg);color:var(–coral);border:0.5px solid var(–coral-bd)}
+.tag-q{background:var(–blue-bg);color:var(–blue);border:0.5px solid var(–blue-bd)}
+.msg-body{font-size:13px;color:var(–text);line-height:1.65;margin-left:35px;background:var(–surface2);padding:9px 12px;border-radius:0 var(–radius-sm) var(–radius-sm) var(–radius-sm);border:0.5px solid var(–border);word-break:break-word}
 .msg-actions{margin-left:35px;margin-top:3px;display:flex;align-items:center;gap:10px}
-.act-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:4px 0;display:flex;align-items:center;gap:3px;min-height:28px}
-.act-btn:active{color:var(--text2)}
-.del-msg-btn{font-size:11px;color:var(--text3);background:none;border:none;padding:4px 0;min-height:28px;margin-left:auto;transition:color .12s;}
-.del-msg-btn:active{color:var(--red);}
+.act-btn{font-size:11px;color:var(–text3);background:none;border:none;padding:4px 0;display:flex;align-items:center;gap:3px;min-height:28px}
+.act-btn:active{color:var(–text2)}
+.del-msg-btn{font-size:11px;color:var(–text3);background:none;border:none;padding:4px 0;min-height:28px;margin-left:auto;transition:color .12s;}
+.del-msg-btn:active{color:var(–red);}
 
 .replies-wrap{overflow:hidden;transition:max-height .25s ease,opacity .2s ease}
 .replies-wrap.collapsed{max-height:0!important;opacity:0}
-.replies{margin-left:35px;margin-top:8px;border-left:2px solid var(--border2);padding-left:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
+.replies{margin-left:35px;margin-top:8px;border-left:2px solid var(–border2);padding-left:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
 .reply{display:flex;flex-direction:column;gap:3px}
 .reply-header{display:flex;align-items:center;gap:6px}
-.reply-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:var(--surface2);border:0.5px solid var(--border2);color:var(--text2)}
-.reply-name{font-size:11px;font-weight:600;color:var(--text2)}
-.reply-time{font-size:10px;color:var(--text3)}
-.reply-body{font-size:12px;color:var(--text);line-height:1.6;margin-left:28px;background:var(--surface2);padding:6px 10px;border-radius:0 var(--radius-sm) var(--radius-sm) var(--radius-sm);border:0.5px solid var(--border);word-break:break-word}
+.reply-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:var(–surface2);border:0.5px solid var(–border2);color:var(–text2)}
+.reply-name{font-size:11px;font-weight:600;color:var(–text2)}
+.reply-time{font-size:10px;color:var(–text3)}
+.reply-body{font-size:12px;color:var(–text);line-height:1.6;margin-left:28px;background:var(–surface2);padding:6px 10px;border-radius:0 var(–radius-sm) var(–radius-sm) var(–radius-sm);border:0.5px solid var(–border);word-break:break-word}
 
-.reply-input-box{margin-left:35px;margin-top:6px;border-left:2px solid var(--teal-bd);padding-left:12px}
-.reply-quote{font-size:11px;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
-.reply-cancel-btn{background:none;border:none;font-size:11px;color:var(--text3);padding:4px;min-height:28px}
+.reply-input-box{margin-left:35px;margin-top:6px;border-left:2px solid var(–teal-bd);padding-left:12px}
+.reply-quote{font-size:11px;color:var(–text3);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.reply-cancel-btn{background:none;border:none;font-size:11px;color:var(–text3);padding:4px;min-height:28px}
 .reply-row{display:flex;gap:6px;align-items:flex-end}
-.reply-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
-.reply-ta:focus{outline:none;border-color:var(--teal)}
-.reply-send-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface);color:var(--text);height:48px;white-space:nowrap}
-.reply-send-btn:active{background:var(--surface2)}
+.reply-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(–border2);border-radius:var(–radius-sm);padding:8px 10px;font-family:inherit;color:var(–text);background:var(–surface);line-height:1.5}
+.reply-ta:focus{outline:none;border-color:var(–teal)}
+.reply-send-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:var(–surface);color:var(–text);height:48px;white-space:nowrap}
+.reply-send-btn:active{background:var(–surface2)}
 
-.input-area{padding:10px 14px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:0.5px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.input-area{padding:10px 14px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:0.5px solid var(–border);background:var(–surface);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
 .input-controls{display:flex;align-items:center;gap:5px;overflow-x:auto}
 .input-controls::-webkit-scrollbar{display:none}
-.ctrl-label{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0}
-.tag-sel-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);white-space:nowrap;flex-shrink:0;min-height:30px}
-.tag-sel-btn.sel-good{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);font-weight:600}
-.tag-sel-btn.sel-imp{background:var(--coral-bg);border-color:var(--coral-bd);color:var(--coral);font-weight:600}
-.tag-sel-btn.sel-q{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);font-weight:600}
-.anon-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500;user-select:none}
+.ctrl-label{font-size:11px;color:var(–text3);white-space:nowrap;flex-shrink:0}
+.tag-sel-btn{font-size:11px;padding:5px 12px;border-radius:99px;border:0.5px solid var(–border2);background:transparent;color:var(–text2);white-space:nowrap;flex-shrink:0;min-height:30px}
+.tag-sel-btn.sel-good{background:var(–teal-bg);border-color:var(–teal-bd);color:var(–teal);font-weight:600}
+.tag-sel-btn.sel-imp{background:var(–coral-bg);border-color:var(–coral-bd);color:var(–coral);font-weight:600}
+.tag-sel-btn.sel-q{background:var(–blue-bg);border-color:var(–blue-bd);color:var(–blue);font-weight:600}
+.anon-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(–text2);margin-left:auto;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:500;user-select:none}
 .anon-label input[type=checkbox]{display:none}
-.anon-check-box{width:22px;height:22px;border-radius:5px;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.anon-label input[type=checkbox]:checked + .anon-check-box{background:var(--teal);border-color:var(--teal)}
+.anon-check-box{width:22px;height:22px;border-radius:5px;border:2px solid var(–border2);background:var(–surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.anon-label input[type=checkbox]:checked + .anon-check-box{background:var(–teal);border-color:var(–teal)}
 .anon-check-mark{width:13px;height:13px;display:none}
 .anon-label input[type=checkbox]:checked + .anon-check-box .anon-check-mark{display:block}
 .input-row{display:flex;gap:8px;align-items:flex-end}
-.msg-ta{flex:1;resize:none;height:54px;font-size:15px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
-.msg-ta:focus{outline:none;border-color:var(--teal)}
-.send-btn{padding:9px 18px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;height:54px;flex-shrink:0}
+.msg-ta{flex:1;resize:none;height:54px;font-size:15px;border:0.5px solid var(–border2);border-radius:var(–radius-sm);padding:9px 11px;font-family:inherit;color:var(–text);background:var(–surface);line-height:1.5}
+.msg-ta:focus{outline:none;border-color:var(–teal)}
+.send-btn{padding:9px 18px;font-size:14px;font-weight:700;border-radius:var(–radius-sm);border:none;background:var(–teal);color:#fff;height:54px;flex-shrink:0}
 .send-btn:active{opacity:.75}
 .send-btn:disabled{opacity:.5}
 
 /* 管理者画面 */
-#screen-admin{min-height:100dvh;flex-direction:column;background:var(--bg)}
-.admin-topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--surface);border-bottom:0.5px solid var(--border2);flex-shrink:0}
-.admin-topbar-title{font-size:14px;font-weight:700;color:var(--text)}
-.admin-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--amber-bg);color:var(--amber);font-weight:600}
-.admin-back{font-size:13px;color:var(--text3);background:none;border:none;margin-left:auto;min-height:36px;padding:0 4px}
+#screen-admin{min-height:100dvh;flex-direction:column;background:var(–bg)}
+.admin-topbar{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(–surface);border-bottom:0.5px solid var(–border2);flex-shrink:0}
+.admin-topbar-title{font-size:14px;font-weight:700;color:var(–text)}
+.admin-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:var(–amber-bg);color:var(–amber);font-weight:600}
+.admin-back{font-size:13px;color:var(–text3);background:none;border:none;margin-left:auto;min-height:36px;padding:0 4px}
 .admin-scroll{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
-.admin-panel{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);overflow:hidden}
-.admin-panel-header{padding:12px 16px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.admin-panel{background:var(–surface);border:0.5px solid var(–border2);border-radius:var(–radius);overflow:hidden}
+.admin-panel-header{padding:12px 16px;border-bottom:0.5px solid var(–border);font-size:11px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.05em}
 .member-table{width:100%;border-collapse:collapse}
-.member-table th{font-size:11px;color:var(--text3);text-align:left;padding:8px 14px;border-bottom:0.5px solid var(--border);font-weight:600}
-.member-table td{font-size:13px;padding:12px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle}
+.member-table th{font-size:11px;color:var(–text3);text-align:left;padding:8px 14px;border-bottom:0.5px solid var(–border);font-weight:600}
+.member-table td{font-size:13px;padding:12px 14px;border-bottom:0.5px solid var(–border);color:var(–text);vertical-align:middle}
 .member-table tr:last-child td{border-bottom:none}
 .role-pill{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
-.role-admin{background:var(--amber-bg);color:var(--amber)}
-.role-leader{background:var(--purple-bg);color:var(--purple)}
-.role-qs{background:var(--teal-bg);color:var(--teal)}
-.role-member{background:var(--surface2);color:var(--text2)}
-.del-btn{font-size:11px;color:var(--red);background:none;border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:5px 10px;min-height:32px}
-.del-btn:active{background:var(--red-bg)}
-.admin-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.admin-card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.role-admin{background:var(–amber-bg);color:var(–amber)}
+.role-leader{background:var(–purple-bg);color:var(–purple)}
+.role-qs{background:var(–teal-bg);color:var(–teal)}
+.role-member{background:var(–surface2);color:var(–text2)}
+.del-btn{font-size:11px;color:var(–red);background:none;border:0.5px solid #f09595;border-radius:var(–radius-sm);padding:5px 10px;min-height:32px}
+.del-btn:active{background:var(–red-bg)}
+.admin-card{background:var(–surface);border:0.5px solid var(–border2);border-radius:var(–radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.admin-card-title{font-size:11px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.05em}
 .admin-field{display:flex;flex-direction:column;gap:5px}
-.admin-field label{font-size:11px;color:var(--text3)}
-.admin-field select{font-size:14px;padding:10px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;color:var(--text);background:var(--surface);width:100%}
-.admin-add-btn{width:100%;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:#fff;min-height:46px}
+.admin-field label{font-size:11px;color:var(–text3)}
+.admin-field select{font-size:14px;padding:10px;border:0.5px solid var(–border2);border-radius:var(–radius-sm);font-family:inherit;color:var(–text);background:var(–surface);width:100%}
+.admin-add-btn{width:100%;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:var(–radius-sm);background:var(–text);color:#fff;min-height:46px}
 .admin-add-btn:active{opacity:.75}
 .pw-row{display:flex;gap:6px}
 .pw-row .field-input{flex:1;font-size:14px;padding:10px}
-.pw-update-btn{font-size:12px;padding:10px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);white-space:nowrap}
-.success-msg{font-size:12px;color:var(--teal);background:var(--teal-bg);border-radius:var(--radius-sm);padding:7px 10px;display:none}
+.pw-update-btn{font-size:12px;padding:10px 12px;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:var(–surface2);color:var(–text);white-space:nowrap}
+.success-msg{font-size:12px;color:var(–teal);background:var(–teal-bg);border-radius:var(–radius-sm);padding:7px 10px;display:none}
 
 /* モーダル（下からスライド） */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;z-index:100}
 .modal-overlay.active{display:flex}
-.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:1.4rem;padding-bottom:max(1.4rem,env(safe-area-inset-bottom));width:100%;max-width:540px;border:0.5px solid var(--border2)}
-.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.2rem}
-.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:1.2rem}
+.modal{background:var(–surface);border-radius:var(–radius) var(–radius) 0 0;padding:1.4rem;padding-bottom:max(1.4rem,env(safe-area-inset-bottom));width:100%;max-width:540px;border:0.5px solid var(–border2)}
+.modal-handle{width:36px;height:4px;background:var(–border2);border-radius:2px;margin:0 auto 1.2rem}
+.modal-title{font-size:15px;font-weight:700;color:var(–text);margin-bottom:1.2rem}
 .modal-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:1.2rem}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end}
-.btn-cancel{padding:11px 18px;font-size:14px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);min-height:46px}
+.btn-cancel{padding:11px 18px;font-size:14px;border-radius:var(–radius-sm);border:0.5px solid var(–border2);background:var(–surface2);color:var(–text2);min-height:46px}
 
 ::-webkit-scrollbar{width:3px;height:3px}
-.quiz-banner{background:var(--blue-bg);border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;display:none}
+.quiz-banner{background:var(–blue-bg);border:0.5px solid var(–blue-bd);border-radius:var(–radius-sm);padding:12px 14px;margin-bottom:10px;display:none}
 .quiz-banner.active{display:block}
-.quiz-question{font-size:14px;font-weight:600;color:var(--blue);line-height:1.6;margin-bottom:10px}
-.quiz-timer{font-size:12px;color:var(--blue);margin-bottom:8px;font-weight:500}
+.quiz-question{font-size:14px;font-weight:600;color:var(–blue);line-height:1.6;margin-bottom:10px}
+.quiz-timer{font-size:12px;color:var(–blue);margin-bottom:8px;font-weight:500}
 .quiz-answer-row{display:flex;gap:8px}
-.quiz-answer-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;color:var(--text);background:var(--surface);line-height:1.5}
-.quiz-answer-ta:focus{outline:none;border-color:var(--blue)}
-.quiz-submit-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;height:48px;white-space:nowrap;flex-shrink:0}
-.quiz-submitted{font-size:12px;color:var(--teal);font-weight:500;padding:6px 0}
-.dash-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.dash-card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
-.quiz-row{background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
-.quiz-row-q{font-size:13px;font-weight:600;color:var(--text)}
+.quiz-answer-ta{flex:1;resize:none;height:48px;font-size:14px;border:0.5px solid var(–blue-bd);border-radius:var(–radius-sm);padding:8px 10px;font-family:inherit;color:var(–text);background:var(–surface);line-height:1.5}
+.quiz-answer-ta:focus{outline:none;border-color:var(–blue)}
+.quiz-submit-btn{padding:8px 14px;font-size:13px;font-weight:600;border-radius:var(–radius-sm);border:none;background:var(–blue);color:#fff;height:48px;white-space:nowrap;flex-shrink:0}
+.quiz-submitted{font-size:12px;color:var(–teal);font-weight:500;padding:6px 0}
+.dash-card{background:var(–surface);border:0.5px solid var(–border2);border-radius:var(–radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.dash-card-title{font-size:11px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.05em}
+.quiz-row{background:var(–surface2);border:0.5px solid var(–border);border-radius:var(–radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.quiz-row-q{font-size:13px;font-weight:600;color:var(–text)}
 .quiz-status-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
-.quiz-draft{background:var(--surface2);color:var(--text3);border:0.5px solid var(--border2)}
-.quiz-active{background:var(--teal-bg);color:var(--teal);border:0.5px solid var(--teal-bd)}
-.quiz-closed{background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2)}
+.quiz-draft{background:var(–surface2);color:var(–text3);border:0.5px solid var(–border2)}
+.quiz-active{background:var(–teal-bg);color:var(–teal);border:0.5px solid var(–teal-bd)}
+.quiz-closed{background:var(–surface2);color:var(–text2);border:0.5px solid var(–border2)}
 .quiz-answer-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.quiz-answer-item{font-size:12px;padding:7px 10px;background:var(--surface);border-radius:var(--radius-sm);border:0.5px solid var(--border);display:flex;align-items:baseline;gap:8px}
-.quiz-answer-name{font-weight:600;color:var(--text2);min-width:80px;flex-shrink:0}
-.quiz-answer-time{font-size:10px;color:var(--teal);font-weight:600;min-width:50px;flex-shrink:0}
-.quiz-answer-text{color:var(--text);flex:1}
-.quiz-avg{font-size:12px;color:var(--text2);font-weight:500}
-.qr-btn{flex-shrink:0;font-size:11px;color:var(--blue);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
+.quiz-answer-item{font-size:12px;padding:7px 10px;background:var(–surface);border-radius:var(–radius-sm);border:0.5px solid var(–border);display:flex;align-items:baseline;gap:8px}
+.quiz-answer-name{font-weight:600;color:var(–text2);min-width:80px;flex-shrink:0}
+.quiz-answer-time{font-size:10px;color:var(–teal);font-weight:600;min-width:50px;flex-shrink:0}
+.quiz-answer-text{color:var(–text);flex:1}
+.quiz-avg{font-size:12px;color:var(–text2);font-weight:500}
+.qr-btn{flex-shrink:0;font-size:11px;color:var(–blue);background:none;border:none;padding:2px 4px;min-height:24px;line-height:1;opacity:0;transition:opacity .15s}
 .case-item:hover .qr-btn,.case-item.active .qr-btn{opacity:1}
-.qr-btn:active{color:var(--teal)}
+.qr-btn:active{color:var(–teal)}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb{background:var(–border2);border-radius:2px}
 </style>
+
 </head>
 <body>
 
 <!-- ログイン画面 -->
+
 <div id="screen-login" class="screen active">
   <div class="login-card">
     <div class="login-logo">救急振り返りルーム</div>
     <div class="login-sub">署内スタッフ専用</div>
 
-    <!-- タブ切り替え -->
-    <div style="display:flex;gap:0;margin-bottom:1.4rem;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;">
-      <button id="tab-login" onclick="switchTab('login')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--text);color:#fff;font-family:inherit;cursor:pointer;">ログイン</button>
-      <button id="tab-register" onclick="switchTab('register')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--surface2);color:var(--text2);font-family:inherit;cursor:pointer;">新規登録</button>
-    </div>
+```
+<!-- タブ切り替え -->
+<div style="display:flex;gap:0;margin-bottom:1.4rem;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;">
+  <button id="tab-login" onclick="switchTab('login')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--text);color:#fff;font-family:inherit;cursor:pointer;">ログイン</button>
+  <button id="tab-register" onclick="switchTab('register')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:var(--surface2);color:var(--text2);font-family:inherit;cursor:pointer;">新規登録</button>
+</div>
 
-    <!-- ログインフォーム -->
-    <div id="form-login" style="display:flex;flex-direction:column;gap:14px;">
-      <div>
-        <div class="field-label">氏名</div>
-        <input class="field-input" type="text" id="login-name" placeholder="例：田中 一郎" autocomplete="username">
-      </div>
-      <div>
-        <div class="field-label">パスワード</div>
-        <input class="field-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
-      </div>
-      <div class="error-msg" id="login-error"></div>
-      <button class="btn-primary" onclick="doLogin()">ログイン</button>
-    </div>
+<!-- ログインフォーム -->
+<div id="form-login" style="display:flex;flex-direction:column;gap:14px;">
+  <div>
+    <div class="field-label">氏名</div>
+    <input class="field-input" type="text" id="login-name" placeholder="例：田中 一郎" autocomplete="username">
+  </div>
+  <div>
+    <div class="field-label">パスワード</div>
+    <input class="field-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
+  </div>
+  <div class="error-msg" id="login-error"></div>
+  <button class="btn-primary" onclick="doLogin()">ログイン</button>
+</div>
 
-    <!-- 新規登録フォーム -->
-    <div id="form-register" style="display:none;flex-direction:column;gap:14px;">
-      <div>
-        <div class="field-label">招待コード</div>
-        <input class="field-input" type="text" id="reg-code" placeholder="例：AICHI-001" autocomplete="off">
-      </div>
-      <div>
-        <div class="field-label">氏名</div>
-        <input class="field-input" type="text" id="reg-name" placeholder="例：田中 一郎">
-      </div>
-      <div>
-        <div class="field-label">役職</div>
-        <select class="field-input" id="reg-role" style="font-size:14px;">
-          <option value="">選択してください</option>
-          <option>管理者</option>
-          <option>隊長</option>
-          <option>救命士</option>
-          <option>隊員</option>
-        </select>
-      </div>
-      <div>
-        <div class="field-label">パスワード</div>
-        <input class="field-input" type="password" id="reg-pw" placeholder="6文字以上" autocomplete="new-password">
-      </div>
-      <div>
-        <div class="field-label">パスワード（確認）</div>
-        <input class="field-input" type="password" id="reg-pw2" placeholder="もう一度入力" autocomplete="new-password">
-      </div>
-      <div class="error-msg" id="reg-error"></div>
-      <button class="btn-primary" onclick="doRegister()">登録する</button>
-    </div>
+<!-- 新規登録フォーム -->
+<div id="form-register" style="display:none;flex-direction:column;gap:14px;">
+  <div>
+    <div class="field-label">招待コード</div>
+    <input class="field-input" type="text" id="reg-code" placeholder="例：AICHI-001" autocomplete="off">
+  </div>
+  <div>
+    <div class="field-label">氏名</div>
+    <input class="field-input" type="text" id="reg-name" placeholder="例：田中 一郎">
+  </div>
+  <div>
+    <div class="field-label">役職</div>
+    <select class="field-input" id="reg-role" style="font-size:14px;">
+      <option value="">選択してください</option>
+      <option>管理者</option>
+      <option>隊長</option>
+      <option>救命士</option>
+      <option>隊員</option>
+    </select>
+  </div>
+  <div>
+    <div class="field-label">パスワード</div>
+    <input class="field-input" type="password" id="reg-pw" placeholder="6文字以上" autocomplete="new-password">
+  </div>
+  <div>
+    <div class="field-label">パスワード（確認）</div>
+    <input class="field-input" type="password" id="reg-pw2" placeholder="もう一度入力" autocomplete="new-password">
+  </div>
+  <div class="error-msg" id="reg-error"></div>
+  <button class="btn-primary" onclick="doRegister()">登録する</button>
+</div>
+```
+
   </div>
 </div>
 
 <!-- チャット画面 -->
+
 <div id="screen-chat" class="screen">
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="sidebar" id="sidebar">
@@ -406,6 +413,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 </div>
 
 <!-- 管理者画面 -->
+
 <div id="screen-admin" class="screen">
   <div class="admin-topbar">
     <div class="admin-topbar-title">管理者メニュー</div>
@@ -435,29 +443,31 @@ textarea,input{-webkit-appearance:none;appearance:none}
       <div id="quiz-list" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
-    <div class="admin-panel">
-      <div class="admin-panel-header">登録隊員一覧</div>
-      <table class="member-table">
-        <thead><tr><th>氏名</th><th>役職</th><th style="width:70px;">PW</th><th style="width:50px;"></th></tr></thead>
-        <tbody id="admin-member-tbody"></tbody>
-      </table>
-    </div>
-    <div class="admin-card">
-      <div class="admin-card-title">招待コード管理</div>
-      <p style="font-size:12px;color:var(--text3);line-height:1.6;">新規登録時に必要なコードを発行します。1つのコードを複数人で使えます。</p>
-      <div style="display:flex;gap:6px;">
-        <input class="field-input" type="text" id="new-invite-code" placeholder="例：AICHI-001" style="font-size:13px;padding:9px 10px;">
-        <button class="admin-add-btn" style="width:auto;padding:9px 14px;white-space:nowrap;" onclick="addInviteCode()">発行</button>
-      </div>
-      <div id="invite-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
-      <div class="success-msg" id="invite-success">発行しました</div>
-    </div>
-
+```
+<div class="admin-panel">
+  <div class="admin-panel-header">登録隊員一覧</div>
+  <table class="member-table">
+    <thead><tr><th>氏名</th><th>役職</th><th style="width:70px;">PW</th><th style="width:50px;"></th></tr></thead>
+    <tbody id="admin-member-tbody"></tbody>
+  </table>
+</div>
+<div class="admin-card">
+  <div class="admin-card-title">招待コード管理</div>
+  <p style="font-size:12px;color:var(--text3);line-height:1.6;">新規登録時に必要なコードを発行します。1つのコードを複数人で使えます。</p>
+  <div style="display:flex;gap:6px;">
+    <input class="field-input" type="text" id="new-invite-code" placeholder="例：AICHI-001" style="font-size:13px;padding:9px 10px;">
+    <button class="admin-add-btn" style="width:auto;padding:9px 14px;white-space:nowrap;" onclick="addInviteCode()">発行</button>
+  </div>
+  <div id="invite-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
+  <div class="success-msg" id="invite-success">発行しました</div>
+</div>
+```
 
   </div>
 </div>
 
 <!-- 症例作成モーダル -->
+
 <div class="modal-overlay" id="modal-new-case">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -510,6 +520,7 @@ textarea,input{-webkit-appearance:none;appearance:none}
 </div>
 
 <!-- QRコードモーダル -->
+
 <div class="modal-overlay" id="modal-qr">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -529,8 +540,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
 /* ================================================
    設定（自分のSupabase情報に書き換えてください）
 ================================================ */
-const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+const SUPABASE_URL      = 'https://xxxxxxxxxxxxxxxxxxxx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.XXXX';
 
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
@@ -724,11 +735,37 @@ async function doRegister() {
   await startChat();
 }
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        // 画面ロックが解除されたら再取得
+        if (currentUser) requestWakeLock();
+      });
+    }
+  } catch (e) {
+    // WakeLock非対応または拒否された場合は無視
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+
+// ページが非表示→表示に戻った時に再取得
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentUser) requestWakeLock();
+});
+
 async function startChat() {
   showScreen('chat');
   document.getElementById('sidebar-username').textContent =
     currentUser.is_admin ? '管理者' : `${currentUser.display_name}（${currentUser.role}）`;
   document.getElementById('admin-btn').style.display = currentUser.is_admin ? '' : 'none';
+  await requestWakeLock();
   await loadCases();
   // cases全体の変更を購読（ロック・非表示のリアルタイム反映用）
   // subscribeRealtimeとは別チャンネルとして一度だけ登録
@@ -791,6 +828,7 @@ function logout() {
   localStorage.removeItem('kyukyu_user');
   currentUser = null; currentCase = null;
   stopRealtime();
+  releaseWakeLock();
   if (window._casesChannel) {
     db.removeChannel(window._casesChannel);
     window._casesChannel = null;
@@ -1139,664 +1177,634 @@ function openReplyInput(parentId, toName) {
     </div>
     <div class="reply-row">
       <textarea class="reply-ta" placeholder="リプライを入力..."></textarea>
-      <button class="reply-send-btn" onclick="sendReply(this,'${parentId}')">送信</button>
-    </div>`;
-  (wrap || msgEl.querySelector('.msg-actions')).after(box);
-  const ta = box.querySelector('textarea');
-  const sendBtn = box.querySelector('.reply-send-btn');
-  ta.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-      e.preventDefault();
-      sendReply(sendBtn, parentId);
-    }
-  });
-  ta.focus();
-  if (wrap) wrap.style.maxHeight = wrap.scrollHeight + 200 + 'px';
+
+```
+  <button class="reply-send-btn" onclick="sendReply(this,'${parentId}')">送信</button>
+</div>`;
+```
+
+(wrap || msgEl.querySelector(’.msg-actions’)).after(box);
+const ta = box.querySelector(‘textarea’);
+const sendBtn = box.querySelector(’.reply-send-btn’);
+ta.addEventListener(‘keydown’, e => {
+if (e.key === ‘Enter’ && !e.shiftKey && !e.isComposing) {
+e.preventDefault();
+sendReply(sendBtn, parentId);
+}
+});
+ta.focus();
+if (wrap) wrap.style.maxHeight = wrap.scrollHeight + 200 + ‘px’;
 }
 
 async function sendReply(btn, parentId) {
-  const ta = btn.closest('.reply-input-box').querySelector('textarea');
-  const body = ta.value.trim();
-  if (!body) return;
-  btn.disabled = true;
-  const { error } = await db.from('messages').insert({
-    case_id:      currentCase.id,
-    parent_id:    parentId,
-    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
-    role:         currentUser.is_admin ? '管理者' : currentUser.role,
-    body, tag: null,
-    is_anonymous: document.getElementById('anon-check').checked,
-    slide_no:     null
-  });
-  if (!error) {
-    btn.closest('.reply-input-box').remove();
-    await loadMessages();
-  } else {
-    console.error('sendReply error:', error);
-    btn.disabled = false;
-    alert('送信に失敗しました: ' + (error.message || JSON.stringify(error)));
-  }
+const ta = btn.closest(’.reply-input-box’).querySelector(‘textarea’);
+const body = ta.value.trim();
+if (!body) return;
+btn.disabled = true;
+const { error } = await db.from(‘messages’).insert({
+case_id:      currentCase.id,
+parent_id:    parentId,
+display_name: currentUser.is_admin ? ‘管理者’ : currentUser.display_name,
+role:         currentUser.is_admin ? ‘管理者’ : currentUser.role,
+body, tag: null,
+is_anonymous: document.getElementById(‘anon-check’).checked,
+slide_no:     null
+});
+if (!error) {
+btn.closest(’.reply-input-box’).remove();
+await loadMessages();
+} else {
+console.error(‘sendReply error:’, error);
+btn.disabled = false;
+alert(’送信に失敗しました: ’ + (error.message || JSON.stringify(error)));
+}
 }
 
 /* ================================================
-   メッセージ送信
+メッセージ送信
 ================================================ */
 function selectTag(btn) {
-  document.querySelectorAll('.tag-sel-btn').forEach(b => b.className = 'tag-sel-btn');
-  currentTag = btn.dataset.tag;
-  const cls = { '良かった点':'sel-good', '改善点':'sel-imp', '質問':'sel-q' }[currentTag]||'';
-  if (cls) btn.classList.add(cls);
+document.querySelectorAll(’.tag-sel-btn’).forEach(b => b.className = ‘tag-sel-btn’);
+currentTag = btn.dataset.tag;
+const cls = { ‘良かった点’:‘sel-good’, ‘改善点’:‘sel-imp’, ‘質問’:‘sel-q’ }[currentTag]||’’;
+if (cls) btn.classList.add(cls);
 }
 
 async function sendMessage() {
-  const ta   = document.getElementById('msg-input');
-  const body = ta.value.trim();
-  if (!body || !currentCase) return;
-  const sendBtn = document.getElementById('send-btn');
-  sendBtn.disabled = true;
-  const { error } = await db.from('messages').insert({
-    case_id:      currentCase.id,
-    parent_id:    null,
-    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
-    role:         currentUser.is_admin ? '管理者' : currentUser.role,
-    body,
-    tag:          currentTag === 'なし' ? null : currentTag,
-    is_anonymous: document.getElementById('anon-check').checked,
-    slide_no:     currentCase && currentCase.slide_enabled ? (currentCase.current_slide || 1) : null
-  });
-  sendBtn.disabled = false;
-  if (!error) ta.value = '';
-  else alert('送信に失敗しました');
+const ta   = document.getElementById(‘msg-input’);
+const body = ta.value.trim();
+if (!body || !currentCase) return;
+const sendBtn = document.getElementById(‘send-btn’);
+sendBtn.disabled = true;
+const { error } = await db.from(‘messages’).insert({
+case_id:      currentCase.id,
+parent_id:    null,
+display_name: currentUser.is_admin ? ‘管理者’ : currentUser.display_name,
+role:         currentUser.is_admin ? ‘管理者’ : currentUser.role,
+body,
+tag:          currentTag === ‘なし’ ? null : currentTag,
+is_anonymous: document.getElementById(‘anon-check’).checked,
+slide_no:     currentCase && currentCase.slide_enabled ? (currentCase.current_slide || 1) : null
+});
+sendBtn.disabled = false;
+if (!error) ta.value = ‘’;
+else alert(‘送信に失敗しました’);
 }
 
 /* ================================================
-   タグフィルター
+タグフィルター
 ================================================ */
 function filterTag(btn) {
-  filterTagVal = btn.dataset.tag;
-  document.querySelectorAll('.tag-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
-  loadMessages();
+filterTagVal = btn.dataset.tag;
+document.querySelectorAll(’.tag-filter-btn’).forEach(b => b.classList.toggle(‘active’, b === btn));
+loadMessages();
 }
 
 /* ================================================
-   Realtime — INSERTとDELETEを購読して全員更新
+Realtime — INSERTとDELETEを購読して全員更新
 ================================================ */
 function subscribeRealtime() {
-  // 既存チャンネルとポーリングをリセット
-  stopRealtime();
-  if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
-  realtimeOk = false;
-  updateRealtimeIndicator();
+// 既存チャンネルとポーリングをリセット
+stopRealtime();
+if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
+realtimeOk = false;
+updateRealtimeIndicator();
 
-  // Realtime 購読
-  realtimeChannel = db
-    .channel('room-' + currentCase.id)
-    .on('postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
-      () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
-    )
-    .on('postgres_changes',
-      { event: 'DELETE', schema: 'public', table: 'messages', filter: `case_id=eq.${currentCase.id}` },
-      () => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
-    )
-    .on('postgres_changes',
-      { event: '*', schema: 'public', table: 'quizzes', filter: `case_id=eq.${currentCase.id}` },
-      async payload => {
-        realtimeOk = true; updateRealtimeIndicator();
-        // 回答入力中はバナーを再描画しない（ただし終了・新規開始は強制更新）
-        const answerInput = document.getElementById('quiz-answer-input');
-        const isTyping = answerInput && document.activeElement === answerInput && answerInput.value.trim().length > 0;
-        const newStatus = payload.new && payload.new.status;
-        if (!isTyping || newStatus === 'closed' || newStatus === 'active') {
-          await loadActiveQuiz();
-        }
-        if (currentUser && currentUser.is_admin) await loadQuizDashboard();
-      }
-    )
-    .on('postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'quiz_answers' },
-      async () => {
-        realtimeOk = true; updateRealtimeIndicator();
-        if (currentUser && currentUser.is_admin) await loadQuizDashboard();
-      }
-    )
-    .on('postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'cases', filter: `id=eq.${currentCase.id}` },
-      async payload => {
-        realtimeOk = true; updateRealtimeIndicator();
-        if (!payload.new) return;
-        const n = payload.new;
-        // スライド番号更新
-        currentCase.current_slide = n.current_slide;
-        currentCase.total_slides  = n.total_slides;
-        const el = document.getElementById('slide-current');
-        const tl = document.getElementById('slide-total');
-        if (el) el.textContent = n.current_slide || 1;
-        if (tl) tl.textContent = '/ ' + (n.total_slides || 1);
-      }
-    )
-    .subscribe(status => {
-      if (status === 'SUBSCRIBED') {
-        realtimeOk = true;
-        updateRealtimeIndicator();
-      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        realtimeOk = false;
-        updateRealtimeIndicator();
-        // Realtime 失敗時は5秒後に再試行
-        setTimeout(() => { if (currentCase) subscribeRealtime(); }, 5000);
-      }
-    });
+// Realtime 購読
+realtimeChannel = db
+.channel(‘room-’ + currentCase.id)
+.on(‘postgres_changes’,
+{ event: ‘INSERT’, schema: ‘public’, table: ‘messages’, filter: `case_id=eq.${currentCase.id}` },
+() => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
+)
+.on(‘postgres_changes’,
+{ event: ‘DELETE’, schema: ‘public’, table: ‘messages’, filter: `case_id=eq.${currentCase.id}` },
+() => { realtimeOk = true; updateRealtimeIndicator(); loadMessages(); }
+)
+.on(‘postgres_changes’,
+{ event: ‘*’, schema: ‘public’, table: ‘quizzes’, filter: `case_id=eq.${currentCase.id}` },
+async payload => {
+realtimeOk = true; updateRealtimeIndicator();
+// 回答入力中はバナーを再描画しない（ただし終了・新規開始は強制更新）
+const answerInput = document.getElementById(‘quiz-answer-input’);
+const isTyping = answerInput && document.activeElement === answerInput && answerInput.value.trim().length > 0;
+const newStatus = payload.new && payload.new.status;
+if (!isTyping || newStatus === ‘closed’ || newStatus === ‘active’) {
+await loadActiveQuiz();
+}
+if (currentUser && currentUser.is_admin) await loadQuizDashboard();
+}
+)
+.on(‘postgres_changes’,
+{ event: ‘INSERT’, schema: ‘public’, table: ‘quiz_answers’ },
+async () => {
+realtimeOk = true; updateRealtimeIndicator();
+if (currentUser && currentUser.is_admin) await loadQuizDashboard();
+}
+)
+.on(‘postgres_changes’,
+{ event: ‘UPDATE’, schema: ‘public’, table: ‘cases’, filter: `id=eq.${currentCase.id}` },
+async payload => {
+realtimeOk = true; updateRealtimeIndicator();
+if (!payload.new) return;
+const n = payload.new;
+// スライド番号更新
+currentCase.current_slide = n.current_slide;
+currentCase.total_slides  = n.total_slides;
+const el = document.getElementById(‘slide-current’);
+const tl = document.getElementById(‘slide-total’);
+if (el) el.textContent = n.current_slide || 1;
+if (tl) tl.textContent = ’/ ’ + (n.total_slides || 1);
+}
+)
+.subscribe(status => {
+if (status === ‘SUBSCRIBED’) {
+realtimeOk = true;
+updateRealtimeIndicator();
+} else if (status === ‘CHANNEL_ERROR’ || status === ‘TIMED_OUT’) {
+realtimeOk = false;
+updateRealtimeIndicator();
+// Realtime 失敗時は5秒後に再試行
+setTimeout(() => { if (currentCase) subscribeRealtime(); }, 5000);
+}
+});
 
-  // ポーリング（5秒ごと）— Realtime の補完
-  pollingTimer = setInterval(() => {
-    if (currentCase) {
-      loadMessages();
-      // 回答入力中はクイズバナーを再描画しない
-      const answerInput = document.getElementById('quiz-answer-input');
-      const isTyping = answerInput && document.activeElement === answerInput && answerInput.value.trim().length > 0;
-      if (!isTyping) loadActiveQuiz();
-    }
-  }, 5000);
+// ポーリング（5秒ごと）— Realtime の補完
+pollingTimer = setInterval(() => {
+if (currentCase) {
+loadMessages();
+// 回答入力中はクイズバナーを再描画しない
+const answerInput = document.getElementById(‘quiz-answer-input’);
+const isTyping = answerInput && document.activeElement === answerInput && answerInput.value.trim().length > 0;
+if (!isTyping) loadActiveQuiz();
+}
+}, 5000);
 }
 
 function updateRealtimeIndicator() {
-  const el = document.getElementById('realtime-indicator');
-  if (!el) return;
-  el.title      = realtimeOk ? 'リアルタイム接続中' : 'ポーリングで更新中';
-  el.style.background = realtimeOk ? '#1D9E75' : '#EF9F27';
+const el = document.getElementById(‘realtime-indicator’);
+if (!el) return;
+el.title      = realtimeOk ? ‘リアルタイム接続中’ : ‘ポーリングで更新中’;
+el.style.background = realtimeOk ? ‘#1D9E75’ : ‘#EF9F27’;
 }
 
 async function deleteMessage(msgId, isReply) {
-  const msg = isReply ? 'このリプライを削除しますか?' : 'このメッセージを削除しますか?\nリプライもすべて削除されます。';
-  if (!confirm(msg)) return;
-  const { error } = await db.from('messages').delete().eq('id', msgId);
-  if (error) alert('削除に失敗しました。RLSの設定を確認してください。');
-  else await loadMessages();
+const msg = isReply ? ‘このリプライを削除しますか?’ : ‘このメッセージを削除しますか?\nリプライもすべて削除されます。’;
+if (!confirm(msg)) return;
+const { error } = await db.from(‘messages’).delete().eq(‘id’, msgId);
+if (error) alert(‘削除に失敗しました。RLSの設定を確認してください。’);
+else await loadMessages();
 }
 
 function stopRealtime() {
-  if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
-  if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
-  realtimeOk = false;
-  updateRealtimeIndicator();
+if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+if (pollingTimer)    { clearInterval(pollingTimer); pollingTimer = null; }
+realtimeOk = false;
+updateRealtimeIndicator();
 }
 
 /* ================================================
-   管理者画面
+管理者画面
 ================================================ */
-async function goAdmin() { showScreen('admin'); await loadAdminMembers(); await loadInviteCodes(); await loadQuizDashboard(); }
-function goChat() { showScreen('chat'); }
+async function goAdmin() { showScreen(‘admin’); await loadAdminMembers(); await loadInviteCodes(); await loadQuizDashboard(); }
+function goChat() { showScreen(‘chat’); }
 
 async function loadAdminMembers() {
-  const { data } = await db.from('members').select('*').order('role').order('display_name');
-  const tbody = document.getElementById('admin-member-tbody');
-  tbody.innerHTML = '';
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" style="font-size:12px;color:var(--text3);padding:12px 14px;">隊員が登録されていません</td></tr>';
-    return;
-  }
-  data.forEach(m => {
-    const tr = document.createElement('tr');
-    const roles = ['管理者','隊長','救命士','隊員'];
-    const opts = roles.map(r =>
-      `<option value="${r}" ${m.role === r ? 'selected' : ''}>${r}</option>`
-    ).join('');
-    tr.innerHTML = `
-      <td style="font-size:13px;">${esc(m.display_name)}</td>
-      <td>
-        <select class="role-select" data-id="${m.id}" onchange="updateMemberRole('${m.id}', this.value)" style="font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;width:90px;">
-          ${opts}
-        </select>
-      </td>
-      <td><button style="font-size:11px;color:var(--blue);background:none;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:4px 6px;cursor:pointer;font-family:inherit;" onclick="resetPassword('${m.id}','${esc(m.display_name)}')">PW</button></td>
-      <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
-    tbody.appendChild(tr);
-  });
+const { data } = await db.from(‘members’).select(’*’).order(‘role’).order(‘display_name’);
+const tbody = document.getElementById(‘admin-member-tbody’);
+tbody.innerHTML = ‘’;
+if (!data || data.length === 0) {
+tbody.innerHTML = ‘<tr><td colspan="3" style="font-size:12px;color:var(--text3);padding:12px 14px;">隊員が登録されていません</td></tr>’;
+return;
+}
+data.forEach(m => {
+const tr = document.createElement(‘tr’);
+const roles = [‘管理者’,‘隊長’,‘救命士’,‘隊員’];
+const opts = roles.map(r =>
+`<option value="${r}" ${m.role === r ? 'selected' : ''}>${r}</option>`
+).join(’’);
+tr.innerHTML = ` <td style="font-size:13px;">${esc(m.display_name)}</td> <td> <select class="role-select" data-id="${m.id}" onchange="updateMemberRole('${m.id}', this.value)" style="font-size:12px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;width:90px;"> ${opts} </select> </td> <td><button style="font-size:11px;color:var(--blue);background:none;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);padding:4px 6px;cursor:pointer;font-family:inherit;" onclick="resetPassword('${m.id}','${esc(m.display_name)}')">PW</button></td> <td><button class="del-btn" onclick="deleteMember('${m.id}','${esc(m.display_name)}')">削除</button></td>`;
+tbody.appendChild(tr);
+});
 }
 
 async function updateMemberRole(id, newRole) {
-  const { error } = await db.from('members').update({ role: newRole }).eq('id', id);
-  if (error) {
-    alert('役職の変更に失敗しました。RLSの設定を確認してください。');
-    await loadAdminMembers();
-  }
+const { error } = await db.from(‘members’).update({ role: newRole }).eq(‘id’, id);
+if (error) {
+alert(‘役職の変更に失敗しました。RLSの設定を確認してください。’);
+await loadAdminMembers();
+}
 }
 
 async function resetPassword(memberId, memberName) {
-  const newPw = prompt(`${memberName} の新しいパスワードを入力してください（6文字以上）:`);
-  if (!newPw) return;
-  if (newPw.length < 6) { alert('パスワードは6文字以上にしてください'); return; }
+const newPw = prompt(`${memberName} の新しいパスワードを入力してください（6文字以上）:`);
+if (!newPw) return;
+if (newPw.length < 6) { alert(‘パスワードは6文字以上にしてください’); return; }
 
-  // SHA-256ハッシュを生成
-  const buf  = new TextEncoder().encode(newPw);
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  const hex  = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+// SHA-256ハッシュを生成
+const buf  = new TextEncoder().encode(newPw);
+const hash = await crypto.subtle.digest(‘SHA-256’, buf);
+const hex  = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,‘0’)).join(’’);
 
-  const { error } = await db.from('members').update({ password_hash: hex }).eq('id', memberId);
-  if (!error) {
-    alert(`${memberName} のパスワードをリセットしました。
+const { error } = await db.from(‘members’).update({ password_hash: hex }).eq(‘id’, memberId);
+if (!error) {
+alert(`${memberName} のパスワードをリセットしました。
 新しいパスワード: ${newPw}
 
 本人に直接お伝えください。`);
-  } else {
-    alert('リセットに失敗しました: ' + (error.message || ''));
-  }
+} else {
+alert(’リセットに失敗しました: ’ + (error.message || ‘’));
+}
 }
 
 async function addMember() {
-  const name = document.getElementById('new-member-name').value.trim();
-  const role = document.getElementById('new-member-role').value;
-  if (!name) return;
-  const { error } = await db.from('members').insert({ display_name: name, role });
-  if (!error) {
-    document.getElementById('new-member-name').value = '';
-    showSuccess('member-success');
-    await loadAdminMembers();
-  } else {
-    document.getElementById('member-error').style.display = 'block';
-    setTimeout(() => document.getElementById('member-error').style.display = 'none', 4000);
-  }
+const name = document.getElementById(‘new-member-name’).value.trim();
+const role = document.getElementById(‘new-member-role’).value;
+if (!name) return;
+const { error } = await db.from(‘members’).insert({ display_name: name, role });
+if (!error) {
+document.getElementById(‘new-member-name’).value = ‘’;
+showSuccess(‘member-success’);
+await loadAdminMembers();
+} else {
+document.getElementById(‘member-error’).style.display = ‘block’;
+setTimeout(() => document.getElementById(‘member-error’).style.display = ‘none’, 4000);
+}
 }
 
 async function deleteMember(id, name) {
-  if (!confirm(`${name}を削除しますか?`)) return;
-  const { error } = await db.from('members').delete().eq('id', id);
-  if (!error) {
-    await loadAdminMembers();
-  } else {
-    const msg = error.message && error.message.includes('row-level security')
-      ? '削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists "members_delete" on members;\ncreate policy "members_delete" on members for delete using (true);'
-      : '削除に失敗しました: ' + (error.message || '');
-    alert(msg);
-  }
+if (!confirm(`${name}を削除しますか?`)) return;
+const { error } = await db.from(‘members’).delete().eq(‘id’, id);
+if (!error) {
+await loadAdminMembers();
+} else {
+const msg = error.message && error.message.includes(‘row-level security’)
+? ‘削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists “members_delete” on members;\ncreate policy “members_delete” on members for delete using (true);’
+: ’削除に失敗しました: ’ + (error.message || ‘’);
+alert(msg);
+}
 }
 
 async function loadInviteCodes() {
-  const { data } = await db.from('invite_codes').select('*').order('created_at', { ascending: false });
-  const list = document.getElementById('invite-list');
-  if (!list) return;
-  list.innerHTML = '';
-  if (!data || data.length === 0) {
-    list.innerHTML = '<div style="font-size:12px;color:var(--text3);">招待コードがありません</div>';
-    return;
-  }
-  data.forEach(inv => {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:var(--radius-sm);border:0.5px solid var(--border);';
-    row.innerHTML = `
-      <span style="flex:1;font-size:13px;font-weight:600;font-family:monospace;color:var(--text);">${esc(inv.code)}</span>
-      <button onclick="deleteInviteCode('${inv.id}','${esc(inv.code)}')" style="font-size:11px;color:var(--red);background:none;border:none;padding:2px 4px;cursor:pointer;">削除</button>`;
-    list.appendChild(row);
-  });
+const { data } = await db.from(‘invite_codes’).select(’*’).order(‘created_at’, { ascending: false });
+const list = document.getElementById(‘invite-list’);
+if (!list) return;
+list.innerHTML = ‘’;
+if (!data || data.length === 0) {
+list.innerHTML = ‘<div style="font-size:12px;color:var(--text3);">招待コードがありません</div>’;
+return;
+}
+data.forEach(inv => {
+const row = document.createElement(‘div’);
+row.style.cssText = ‘display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(–surface2);border-radius:var(–radius-sm);border:0.5px solid var(–border);’;
+row.innerHTML = ` <span style="flex:1;font-size:13px;font-weight:600;font-family:monospace;color:var(--text);">${esc(inv.code)}</span> <button onclick="deleteInviteCode('${inv.id}','${esc(inv.code)}')" style="font-size:11px;color:var(--red);background:none;border:none;padding:2px 4px;cursor:pointer;">削除</button>`;
+list.appendChild(row);
+});
 }
 
 async function addInviteCode() {
-  const input = document.getElementById('new-invite-code');
-  const code  = input.value.trim().toUpperCase();
-  if (!code) return;
-  const { error } = await db.from('invite_codes').insert({ code });
-  if (!error) {
-    input.value = '';
-    showSuccess('invite-success');
-    await loadInviteCodes();
-  } else {
-    alert('発行に失敗しました: ' + (error.message || ''));
-  }
+const input = document.getElementById(‘new-invite-code’);
+const code  = input.value.trim().toUpperCase();
+if (!code) return;
+const { error } = await db.from(‘invite_codes’).insert({ code });
+if (!error) {
+input.value = ‘’;
+showSuccess(‘invite-success’);
+await loadInviteCodes();
+} else {
+alert(’発行に失敗しました: ’ + (error.message || ‘’));
+}
 }
 
 async function deleteInviteCode(id, code) {
-  if (!confirm(`招待コード「${code}」を削除しますか?`)) return;
-  const { error } = await db.from('invite_codes').delete().eq('id', id);
-  if (!error) await loadInviteCodes();
-  else alert('削除に失敗しました');
+if (!confirm(`招待コード「${code}」を削除しますか?`)) return;
+const { error } = await db.from(‘invite_codes’).delete().eq(‘id’, id);
+if (!error) await loadInviteCodes();
+else alert(‘削除に失敗しました’);
 }
 
-
-
-
-
 function showQR(event, caseId, caseTitle) {
-  event.stopPropagation();
-  const base = window.location.href.split('?')[0];
-  const url  = `${base}?case=${caseId}`;
-  document.getElementById('qr-modal-title').textContent = caseTitle;
-  document.getElementById('qr-url').textContent = url;
-  // QRコード描画エリアをリセット
-  const container = document.getElementById('qr-container');
-  container.innerHTML = '';
-  new QRCode(container, {
-    text:          url,
-    width:         240,
-    height:        240,
-    colorDark:     '#1a1a18',
-    colorLight:    '#ffffff',
-    correctLevel:  QRCode.CorrectLevel.H
-  });
-  document.getElementById('modal-qr').classList.add('active');
+event.stopPropagation();
+const base = window.location.href.split(’?’)[0];
+const url  = `${base}?case=${caseId}`;
+document.getElementById(‘qr-modal-title’).textContent = caseTitle;
+document.getElementById(‘qr-url’).textContent = url;
+// QRコード描画エリアをリセット
+const container = document.getElementById(‘qr-container’);
+container.innerHTML = ‘’;
+new QRCode(container, {
+text:          url,
+width:         240,
+height:        240,
+colorDark:     ‘#1a1a18’,
+colorLight:    ‘#ffffff’,
+correctLevel:  QRCode.CorrectLevel.H
+});
+document.getElementById(‘modal-qr’).classList.add(‘active’);
 }
 
 function downloadQR() {
-  const container = document.getElementById('qr-container');
-  const img = container.querySelector('img');
-  const canvas = container.querySelector('canvas');
-  const title = document.getElementById('qr-modal-title').textContent;
-  const link = document.createElement('a');
-  link.download = `QR_${title}.png`;
-  if (canvas) {
-    link.href = canvas.toDataURL();
-  } else if (img) {
-    link.href = img.src;
-  }
-  link.click();
+const container = document.getElementById(‘qr-container’);
+const img = container.querySelector(‘img’);
+const canvas = container.querySelector(‘canvas’);
+const title = document.getElementById(‘qr-modal-title’).textContent;
+const link = document.createElement(‘a’);
+link.download = `QR_${title}.png`;
+if (canvas) {
+link.href = canvas.toDataURL();
+} else if (img) {
+link.href = img.src;
+}
+link.click();
 }
 
 async function toggleSlideEnabled(enabled) {
-  if (!currentCase || !currentUser || !currentUser.is_admin) return;
-  const inner = document.getElementById('slide-controls-inner');
-  if (inner) inner.style.display = enabled ? 'flex' : 'none';
-  const { error } = await db.from('cases').update({ slide_enabled: enabled }).eq('id', currentCase.id);
-  if (error) alert('更新に失敗しました');
-  else currentCase.slide_enabled = enabled;
+if (!currentCase || !currentUser || !currentUser.is_admin) return;
+const inner = document.getElementById(‘slide-controls-inner’);
+if (inner) inner.style.display = enabled ? ‘flex’ : ‘none’;
+const { error } = await db.from(‘cases’).update({ slide_enabled: enabled }).eq(‘id’, currentCase.id);
+if (error) alert(‘更新に失敗しました’);
+else currentCase.slide_enabled = enabled;
 }
 
 async function changeSlide(delta) {
-  if (!currentCase || !currentUser || !currentUser.is_admin) return;
-  const tot = currentCase.total_slides || 1;
-  const cur = Math.min(Math.max((currentCase.current_slide || 1) + delta, 1), tot);
-  const { error } = await db.from('cases').update({ current_slide: cur }).eq('id', currentCase.id);
-  if (error) { alert('更新に失敗しました'); return; }
-  currentCase.current_slide = cur;
-  document.getElementById('slide-current').textContent = cur;
+if (!currentCase || !currentUser || !currentUser.is_admin) return;
+const tot = currentCase.total_slides || 1;
+const cur = Math.min(Math.max((currentCase.current_slide || 1) + delta, 1), tot);
+const { error } = await db.from(‘cases’).update({ current_slide: cur }).eq(‘id’, currentCase.id);
+if (error) { alert(‘更新に失敗しました’); return; }
+currentCase.current_slide = cur;
+document.getElementById(‘slide-current’).textContent = cur;
 }
 
 async function setTotalSlides(val) {
-  if (!currentCase || !currentUser || !currentUser.is_admin) return;
-  const tot = Math.max(parseInt(val) || 1, 1);
-  const { error } = await db.from('cases').update({ total_slides: tot }).eq('id', currentCase.id);
-  if (error) { alert('更新に失敗しました'); return; }
-  currentCase.total_slides = tot;
-  document.getElementById('slide-total').textContent = '/ ' + tot;
-  // currentが超えたら修正
-  if ((currentCase.current_slide || 1) > tot) {
-    currentCase.current_slide = tot;
-    await db.from('cases').update({ current_slide: tot }).eq('id', currentCase.id);
-    document.getElementById('slide-current').textContent = tot;
-  }
+if (!currentCase || !currentUser || !currentUser.is_admin) return;
+const tot = Math.max(parseInt(val) || 1, 1);
+const { error } = await db.from(‘cases’).update({ total_slides: tot }).eq(‘id’, currentCase.id);
+if (error) { alert(‘更新に失敗しました’); return; }
+currentCase.total_slides = tot;
+document.getElementById(‘slide-total’).textContent = ’/ ’ + tot;
+// currentが超えたら修正
+if ((currentCase.current_slide || 1) > tot) {
+currentCase.current_slide = tot;
+await db.from(‘cases’).update({ current_slide: tot }).eq(‘id’, currentCase.id);
+document.getElementById(‘slide-current’).textContent = tot;
+}
 }
 
 /* ================================================
-   クイズ機能
+クイズ機能
 ================================================ */
 let quizTimerInterval = null;
 let currentQuizId     = null;
 
 async function loadQuizDashboard() {
-  const label = document.getElementById('quiz-case-label');
-  const area  = document.getElementById('quiz-create-area');
-  const list  = document.getElementById('quiz-list');
-  if (!currentCase) {
-    label.textContent = '症例を選択してチャットに戻ってから管理者画面を開いてください';
-    area.style.display = 'none';
-    list.innerHTML = '';
-    return;
-  }
-  label.textContent = `症例: ${currentCase.title}`;
-  area.style.display = 'flex';
+const label = document.getElementById(‘quiz-case-label’);
+const area  = document.getElementById(‘quiz-create-area’);
+const list  = document.getElementById(‘quiz-list’);
+if (!currentCase) {
+label.textContent = ‘症例を選択してチャットに戻ってから管理者画面を開いてください’;
+area.style.display = ‘none’;
+list.innerHTML = ‘’;
+return;
+}
+label.textContent = `症例: ${currentCase.title}`;
+area.style.display = ‘flex’;
 
-  const { data: quizzes } = await db.from('quizzes')
-    .select('*').eq('case_id', currentCase.id).order('created_at');
-  list.innerHTML = '';
-  if (!quizzes || quizzes.length === 0) {
-    list.innerHTML = '<div style="font-size:12px;color:var(--text3);">問題がありません</div>';
-    return;
-  }
-  for (const q of quizzes) {
-    const { data: answers } = await db.from('quiz_answers')
-      .select('*').eq('quiz_id', q.id).order('answered_at');
-    const avg = answers && answers.length > 0
-      ? Math.round(answers.reduce((s, a) => s + (a.elapsed_seconds || 0), 0) / answers.length)
-      : null;
-    const statusLabel = { draft: '未開始', active: '開始中', closed: '終了' }[q.status] || q.status;
-    const statusCls   = { draft: 'quiz-draft', active: 'quiz-active', closed: 'quiz-closed' }[q.status] || 'quiz-draft';
-    const answerHTML = answers && answers.length > 0
-      ? answers.map(a => `
-        <div class="quiz-answer-item">
-          <span class="quiz-answer-name">${esc(a.display_name)}</span>
-          <span class="quiz-answer-time">${a.elapsed_seconds != null ? a.elapsed_seconds + '秒' : '-'}</span>
-          <span class="quiz-answer-text">${esc(a.answer)}</span>
-        </div>`).join('')
-      : '<div style="font-size:12px;color:var(--text3);padding:4px 0;">まだ回答がありません</div>';
-    const typeLabel = q.quiz_type === 'choice' ? '選択肢式' : '記述式';
-    const typeBadge = `<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);border:0.5px solid var(--border2);">${typeLabel}</span>`;
-    const avgHTML = avg != null ? `<div class="quiz-avg">平均回答時間: ${avg}秒 （${answers.length}名回答）</div>` : '';
-    const startBtn = q.status === 'draft'
-      ? `<button onclick="startQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;cursor:pointer;font-family:inherit;">開始</button>` : '';
-    const closeBtn = q.status === 'active'
-      ? `<button onclick="closeQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;">終了</button>` : '';
-    const delBtn = q.status !== 'active'
-      ? `<button onclick="deleteQuiz('${q.id}')" style="font-size:11px;color:var(--red);background:none;border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;font-family:inherit;">削除</button>` : '';
-    const row = document.createElement('div');
-    row.className = 'quiz-row';
-    row.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span class="quiz-status-badge ${statusCls}">${statusLabel}</span>
-        ${typeBadge}
-        <span class="quiz-row-q">${esc(q.question)}</span>
-        <div style="margin-left:auto;display:flex;gap:6px;">${startBtn}${closeBtn}${delBtn}</div>
-      </div>
-      ${avgHTML}
-      <div class="quiz-answer-list">${answerHTML}</div>`;
-    list.appendChild(row);
-  }
+const { data: quizzes } = await db.from(‘quizzes’)
+.select(’*’).eq(‘case_id’, currentCase.id).order(‘created_at’);
+list.innerHTML = ‘’;
+if (!quizzes || quizzes.length === 0) {
+list.innerHTML = ‘<div style="font-size:12px;color:var(--text3);">問題がありません</div>’;
+return;
+}
+for (const q of quizzes) {
+const { data: answers } = await db.from(‘quiz_answers’)
+.select(’*’).eq(‘quiz_id’, q.id).order(‘answered_at’);
+const avg = answers && answers.length > 0
+? Math.round(answers.reduce((s, a) => s + (a.elapsed_seconds || 0), 0) / answers.length)
+: null;
+const statusLabel = { draft: ‘未開始’, active: ‘開始中’, closed: ‘終了’ }[q.status] || q.status;
+const statusCls   = { draft: ‘quiz-draft’, active: ‘quiz-active’, closed: ‘quiz-closed’ }[q.status] || ‘quiz-draft’;
+const answerHTML = answers && answers.length > 0
+? answers.map(a => ` <div class="quiz-answer-item"> <span class="quiz-answer-name">${esc(a.display_name)}</span> <span class="quiz-answer-time">${a.elapsed_seconds != null ? a.elapsed_seconds + '秒' : '-'}</span> <span class="quiz-answer-text">${esc(a.answer)}</span> </div>`).join(’’)
+: ‘<div style="font-size:12px;color:var(--text3);padding:4px 0;">まだ回答がありません</div>’;
+const typeLabel = q.quiz_type === ‘choice’ ? ‘選択肢式’ : ‘記述式’;
+const typeBadge = `<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);border:0.5px solid var(--border2);">${typeLabel}</span>`;
+const avgHTML = avg != null ? `<div class="quiz-avg">平均回答時間: ${avg}秒 （${answers.length}名回答）</div>` : ‘’;
+const startBtn = q.status === ‘draft’
+? `<button onclick="startQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:none;background:var(--teal);color:#fff;cursor:pointer;font-family:inherit;">開始</button>` : ‘’;
+const closeBtn = q.status === ‘active’
+? `<button onclick="closeQuiz('${q.id}')" style="font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;">終了</button>` : ‘’;
+const delBtn = q.status !== ‘active’
+? `<button onclick="deleteQuiz('${q.id}')" style="font-size:11px;color:var(--red);background:none;border:0.5px solid #f09595;border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;font-family:inherit;">削除</button>` : ‘’;
+const row = document.createElement(‘div’);
+row.className = ‘quiz-row’;
+row.innerHTML = ` <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"> <span class="quiz-status-badge ${statusCls}">${statusLabel}</span> ${typeBadge} <span class="quiz-row-q">${esc(q.question)}</span> <div style="margin-left:auto;display:flex;gap:6px;">${startBtn}${closeBtn}${delBtn}</div> </div> ${avgHTML} <div class="quiz-answer-list">${answerHTML}</div>`;
+list.appendChild(row);
+}
 }
 
 function toggleChoicesInput() {
-  const type = document.querySelector('input[name="quiz-type"]:checked')?.value;
-  const area = document.getElementById('choices-input-area');
-  if (area) area.style.display = type === 'choice' ? 'flex' : 'none';
+const type = document.querySelector(‘input[name=“quiz-type”]:checked’)?.value;
+const area = document.getElementById(‘choices-input-area’);
+if (area) area.style.display = type === ‘choice’ ? ‘flex’ : ‘none’;
 }
 
 async function createQuiz() {
-  const q    = document.getElementById('quiz-question-input').value.trim();
-  const type = document.querySelector('input[name="quiz-type"]:checked')?.value || 'text';
-  if (!q || !currentCase) return;
-  let choices = null;
-  if (type === 'choice') {
-    const raw = document.getElementById('quiz-choices-input').value;
-    choices = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-    if (choices.length < 2) { alert('選択肢を2つ以上入力してください'); return; }
-    if (choices.length > 6) { alert('選択肢は6つまでです'); return; }
-  }
-  const { error } = await db.from('quizzes').insert({
-    case_id: currentCase.id, question: q, quiz_type: type,
-    choices: choices ? JSON.stringify(choices) : null,
-    status: 'draft', created_by: currentUser.display_name
-  });
-  if (!error) {
-    document.getElementById('quiz-question-input').value = '';
-    if (document.getElementById('quiz-choices-input'))
-      document.getElementById('quiz-choices-input').value = '';
-    await loadQuizDashboard();
-  } else alert('作成に失敗しました');
+const q    = document.getElementById(‘quiz-question-input’).value.trim();
+const type = document.querySelector(‘input[name=“quiz-type”]:checked’)?.value || ‘text’;
+if (!q || !currentCase) return;
+let choices = null;
+if (type === ‘choice’) {
+const raw = document.getElementById(‘quiz-choices-input’).value;
+choices = raw.split(’\n’).map(s => s.trim()).filter(s => s.length > 0);
+if (choices.length < 2) { alert(‘選択肢を2つ以上入力してください’); return; }
+if (choices.length > 6) { alert(‘選択肢は6つまでです’); return; }
+}
+const { error } = await db.from(‘quizzes’).insert({
+case_id: currentCase.id, question: q, quiz_type: type,
+choices: choices ? JSON.stringify(choices) : null,
+status: ‘draft’, created_by: currentUser.display_name
+});
+if (!error) {
+document.getElementById(‘quiz-question-input’).value = ‘’;
+if (document.getElementById(‘quiz-choices-input’))
+document.getElementById(‘quiz-choices-input’).value = ‘’;
+await loadQuizDashboard();
+} else alert(‘作成に失敗しました’);
 }
 
 async function startQuiz(quizId) {
-  const { error } = await db.from('quizzes')
-    .update({ status: 'active', started_at: new Date().toISOString() })
-    .eq('id', quizId);
-  if (!error) await loadQuizDashboard();
-  else alert('開始に失敗しました');
+const { error } = await db.from(‘quizzes’)
+.update({ status: ‘active’, started_at: new Date().toISOString() })
+.eq(‘id’, quizId);
+if (!error) await loadQuizDashboard();
+else alert(‘開始に失敗しました’);
 }
 
 async function closeQuiz(quizId) {
-  const { error } = await db.from('quizzes')
-    .update({ status: 'closed', closed_at: new Date().toISOString() })
-    .eq('id', quizId);
-  if (!error) await loadQuizDashboard();
-  else alert('終了に失敗しました');
+const { error } = await db.from(‘quizzes’)
+.update({ status: ‘closed’, closed_at: new Date().toISOString() })
+.eq(‘id’, quizId);
+if (!error) await loadQuizDashboard();
+else alert(‘終了に失敗しました’);
 }
 
 async function deleteQuiz(quizId) {
-  if (!confirm('この問題を削除しますか?')) return;
-  const { error } = await db.from('quizzes').delete().eq('id', quizId);
-  if (error) {
-    const msg = error.message && error.message.includes('row-level security')
-      ? '削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists "quizzes_delete" on quizzes;\ncreate policy "quizzes_delete" on quizzes for delete using (true);'
-      : '削除に失敗しました: ' + (error.message || '');
-    alert(msg);
-    return;
-  }
-  await loadQuizDashboard();
+if (!confirm(‘この問題を削除しますか?’)) return;
+const { error } = await db.from(‘quizzes’).delete().eq(‘id’, quizId);
+if (error) {
+const msg = error.message && error.message.includes(‘row-level security’)
+? ‘削除できません。Supabase SQL Editor で次を実行してください:\n\ndrop policy if exists “quizzes_delete” on quizzes;\ncreate policy “quizzes_delete” on quizzes for delete using (true);’
+: ’削除に失敗しました: ’ + (error.message || ‘’);
+alert(msg);
+return;
+}
+await loadQuizDashboard();
 }
 
 // 参加者向け：アクティブな問題を取得してバナー表示
 async function loadActiveQuiz() {
-  if (!currentCase) return;
-  const { data } = await db.from('quizzes')
-    .select('*').eq('case_id', currentCase.id).eq('status', 'active').maybeSingle();
-  if (data) {
-    // 同じ問題が既に表示中かつ入力中の場合はスキップ
-    if (currentQuizId === data.id) {
-      const answerInput = document.getElementById('quiz-answer-input');
-      const isTyping = answerInput && answerInput.value.trim().length > 0;
-      if (isTyping) return;
-    }
-    showQuizBanner(data);
-  } else {
-    hideQuizBanner();
-  }
+if (!currentCase) return;
+const { data } = await db.from(‘quizzes’)
+.select(’*’).eq(‘case_id’, currentCase.id).eq(‘status’, ‘active’).maybeSingle();
+if (data) {
+// 同じ問題が既に表示中かつ入力中の場合はスキップ
+if (currentQuizId === data.id) {
+const answerInput = document.getElementById(‘quiz-answer-input’);
+const isTyping = answerInput && answerInput.value.trim().length > 0;
+if (isTyping) return;
+}
+showQuizBanner(data);
+} else {
+hideQuizBanner();
+}
 }
 
 function showQuizBanner(quiz) {
-  currentQuizId = quiz.id;
-  document.getElementById('quiz-banner-question').textContent = quiz.question;
-  document.getElementById('quiz-banner').classList.add('active');
+currentQuizId = quiz.id;
+document.getElementById(‘quiz-banner-question’).textContent = quiz.question;
+document.getElementById(‘quiz-banner’).classList.add(‘active’);
 
-  const answeredKey = 'quiz_answered_' + quiz.id;
-  const area = document.getElementById('quiz-answer-area');
+const answeredKey = ‘quiz_answered_’ + quiz.id;
+const area = document.getElementById(‘quiz-answer-area’);
 
-  if (localStorage.getItem(answeredKey)) {
-    area.innerHTML = '<div class="quiz-submitted">回答済みです</div>';
-  } else if (quiz.quiz_type === 'choice' && quiz.choices) {
-    // 選択肢式
-    const choices = typeof quiz.choices === 'string' ? JSON.parse(quiz.choices) : quiz.choices;
-    const btns = choices.map((c, i) =>
-      `<button class="choice-btn" onclick="submitChoiceAnswer('${quiz.id}', ${i}, this)"
-        style="width:100%;padding:12px;font-size:14px;text-align:left;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:6px;transition:background .12s;"
-        onmouseover="this.style.background='var(--blue-bg)'" onmouseout="this.style.background='var(--surface)'">
-        ${esc(c)}
-      </button>`
-    ).join('');
-    area.innerHTML = `<div style="display:flex;flex-direction:column;gap:0;">${btns}</div>`;
-  } else {
-    // 記述式
-    area.innerHTML = `
-      <div class="quiz-answer-row">
-        <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea>
-        <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button>
-      </div>`;
-  }
+if (localStorage.getItem(answeredKey)) {
+area.innerHTML = ‘<div class="quiz-submitted">回答済みです</div>’;
+} else if (quiz.quiz_type === ‘choice’ && quiz.choices) {
+// 選択肢式
+const choices = typeof quiz.choices === ‘string’ ? JSON.parse(quiz.choices) : quiz.choices;
+const btns = choices.map((c, i) =>
+`<button class="choice-btn" onclick="submitChoiceAnswer('${quiz.id}', ${i}, this)" style="width:100%;padding:12px;font-size:14px;text-align:left;border:0.5px solid var(--blue-bd);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:6px;transition:background .12s;" onmouseover="this.style.background='var(--blue-bg)'" onmouseout="this.style.background='var(--surface)'"> ${esc(c)} </button>`
+).join(’’);
+area.innerHTML = `<div style="display:flex;flex-direction:column;gap:0;">${btns}</div>`;
+} else {
+// 記述式
+area.innerHTML = ` <div class="quiz-answer-row"> <textarea class="quiz-answer-ta" id="quiz-answer-input" placeholder="回答を入力..."></textarea> <button class="quiz-submit-btn" id="quiz-submit-btn" onclick="submitQuizAnswer()">回答する</button> </div>`;
+}
 
-  // タイマーは内部計測のみ（表示しない）
-  if (quizTimerInterval) clearInterval(quizTimerInterval);
+// タイマーは内部計測のみ（表示しない）
+if (quizTimerInterval) clearInterval(quizTimerInterval);
 }
 
 function hideQuizBanner() {
-  currentQuizId = null;
-  document.getElementById('quiz-banner').classList.remove('active');
-  if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
+currentQuizId = null;
+document.getElementById(‘quiz-banner’).classList.remove(‘active’);
+if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
 }
 
 async function submitChoiceAnswer(quizId, choiceIndex, btnEl) {
-  // 全ボタン無効化
-  btnEl.closest('div').querySelectorAll('button').forEach(b => b.disabled = true);
-  const { data: quiz } = await db.from('quizzes').select('started_at,choices').eq('id', quizId).single();
-  const choices = quiz && quiz.choices ? (typeof quiz.choices === 'string' ? JSON.parse(quiz.choices) : quiz.choices) : [];
-  const answer  = choices[choiceIndex] || '';
-  const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
-  const { error } = await db.from('quiz_answers').insert({
-    quiz_id: quizId, member_id: currentUser.id !== 'admin' ? currentUser.id : null,
-    display_name: currentUser.is_admin ? '管理者' : currentUser.display_name,
-    answer, elapsed_seconds: elapsed
-  });
-  if (!error) {
-    localStorage.setItem('quiz_answered_' + quizId, '1');
-    document.getElementById('quiz-answer-area').innerHTML = '<div class="quiz-submitted">回答しました！</div>';
-  } else {
-    btnEl.closest('div').querySelectorAll('button').forEach(b => b.disabled = false);
-    alert('送信に失敗しました');
-  }
+// 全ボタン無効化
+btnEl.closest(‘div’).querySelectorAll(‘button’).forEach(b => b.disabled = true);
+const { data: quiz } = await db.from(‘quizzes’).select(‘started_at,choices’).eq(‘id’, quizId).single();
+const choices = quiz && quiz.choices ? (typeof quiz.choices === ‘string’ ? JSON.parse(quiz.choices) : quiz.choices) : [];
+const answer  = choices[choiceIndex] || ‘’;
+const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
+const { error } = await db.from(‘quiz_answers’).insert({
+quiz_id: quizId, member_id: currentUser.id !== ‘admin’ ? currentUser.id : null,
+display_name: currentUser.is_admin ? ‘管理者’ : currentUser.display_name,
+answer, elapsed_seconds: elapsed
+});
+if (!error) {
+localStorage.setItem(‘quiz_answered_’ + quizId, ‘1’);
+document.getElementById(‘quiz-answer-area’).innerHTML = ‘<div class="quiz-submitted">回答しました！</div>’;
+} else {
+btnEl.closest(‘div’).querySelectorAll(‘button’).forEach(b => b.disabled = false);
+alert(‘送信に失敗しました’);
+}
 }
 
 async function submitQuizAnswer() {
-  const ta = document.getElementById('quiz-answer-input');
-  const answer = ta ? ta.value.trim() : '';
-  if (!answer || !currentQuizId) return;
-  const btn = document.getElementById('quiz-submit-btn');
-  if (btn) btn.disabled = true;
+const ta = document.getElementById(‘quiz-answer-input’);
+const answer = ta ? ta.value.trim() : ‘’;
+if (!answer || !currentQuizId) return;
+const btn = document.getElementById(‘quiz-submit-btn’);
+if (btn) btn.disabled = true;
 
-  // 開始時刻を取得して経過秒数を計算
-  const { data: quiz } = await db.from('quizzes').select('started_at').eq('id', currentQuizId).single();
-  const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
+// 開始時刻を取得して経過秒数を計算
+const { data: quiz } = await db.from(‘quizzes’).select(‘started_at’).eq(‘id’, currentQuizId).single();
+const elapsed = quiz ? Math.floor((Date.now() - new Date(quiz.started_at).getTime()) / 1000) : null;
 
-  const { error } = await db.from('quiz_answers').insert({
-    quiz_id:         currentQuizId,
-    member_id:       currentUser.id !== 'admin' ? currentUser.id : null,
-    display_name:    currentUser.is_admin ? '管理者' : currentUser.display_name,
-    answer,
-    elapsed_seconds: elapsed
-  });
-  if (!error) {
-    localStorage.setItem('quiz_answered_' + currentQuizId, '1');
-    document.getElementById('quiz-answer-area').innerHTML =
-      '<div class="quiz-submitted">回答しました！</div>';
-  } else {
-    if (btn) btn.disabled = false;
-    alert('送信に失敗しました');
-  }
+const { error } = await db.from(‘quiz_answers’).insert({
+quiz_id:         currentQuizId,
+member_id:       currentUser.id !== ‘admin’ ? currentUser.id : null,
+display_name:    currentUser.is_admin ? ‘管理者’ : currentUser.display_name,
+answer,
+elapsed_seconds: elapsed
+});
+if (!error) {
+localStorage.setItem(‘quiz_answered_’ + currentQuizId, ‘1’);
+document.getElementById(‘quiz-answer-area’).innerHTML =
+‘<div class="quiz-submitted">回答しました！</div>’;
+} else {
+if (btn) btn.disabled = false;
+alert(‘送信に失敗しました’);
+}
 }
 
 async function toggleCaseMode() {
-  if (!currentCase || !currentUser || !currentUser.is_admin) return;
-  const newMode = currentCase.mode === 'private' ? 'public' : 'private';
-  const label   = newMode === 'private' ? '非公開' : '掲示板（公開）';
-  if (!confirm(`この症例を「${label}」モードに変更しますか?`)) return;
-  const { error } = await db.from('cases').update({ mode: newMode }).eq('id', currentCase.id);
-  if (error) { alert('変更に失敗しました'); return; }
-  currentCase.mode = newMode;
-  // バッジ更新
-  const badge = document.getElementById('case-mode-badge');
-  const isPrivate = newMode === 'private';
-  badge.textContent = isPrivate ? '非公開' : '公開';
-  badge.className   = 'mode-badge ' + (isPrivate ? 'mode-private' : 'mode-public');
-  // サイドバーも更新
-  await loadCases();
-  await loadMessages();
+if (!currentCase || !currentUser || !currentUser.is_admin) return;
+const newMode = currentCase.mode === ‘private’ ? ‘public’ : ‘private’;
+const label   = newMode === ‘private’ ? ‘非公開’ : ‘掲示板（公開）’;
+if (!confirm(`この症例を「${label}」モードに変更しますか?`)) return;
+const { error } = await db.from(‘cases’).update({ mode: newMode }).eq(‘id’, currentCase.id);
+if (error) { alert(‘変更に失敗しました’); return; }
+currentCase.mode = newMode;
+// バッジ更新
+const badge = document.getElementById(‘case-mode-badge’);
+const isPrivate = newMode === ‘private’;
+badge.textContent = isPrivate ? ‘非公開’ : ‘公開’;
+badge.className   = ’mode-badge ’ + (isPrivate ? ‘mode-private’ : ‘mode-public’);
+// サイドバーも更新
+await loadCases();
+await loadMessages();
 }
 
 /* ================================================
-   ユーティリティ
+ユーティリティ
 ================================================ */
 function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+document.querySelectorAll(’.screen’).forEach(s => s.classList.remove(‘active’));
+document.getElementById(‘screen-’ + name).classList.add(‘active’);
 }
 function tagClass(tag) {
-  return { '良かった点':'tag-good', '改善点':'tag-imp', '質問':'tag-q' }[tag] || '';
+return { ‘良かった点’:‘tag-good’, ‘改善点’:‘tag-imp’, ‘質問’:‘tag-q’ }[tag] || ‘’;
 }
 function formatTime(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+if (!iso) return ‘’;
+const d = new Date(iso);
+return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 function esc(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+return String(str||’’).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’);
 }
 function showSuccess(id) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 2500);
+const el = document.getElementById(id);
+el.style.display = ‘block’;
+setTimeout(() => el.style.display = ‘none’, 2500);
 }
 </script>
+
 </body>
 </html>
