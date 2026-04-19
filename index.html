@@ -681,11 +681,11 @@ async function doRegister() {
   const pw    = document.getElementById('reg-pw').value;
   const pw2   = document.getElementById('reg-pw2').value;
 
-  if (!code)        { showAuthError('reg-error', '招待コードを入力してください'); return; }
-  if (!name)        { showAuthError('reg-error', '氏名を入力してください'); return; }
-  if (!role)        { showAuthError('reg-error', '役職を選択してください'); return; }
-  if (pw.length < 6){ showAuthError('reg-error', 'パスワードは6文字以上にしてください'); return; }
-  if (pw !== pw2)   { showAuthError('reg-error', 'パスワードが一致しません'); return; }
+  if (!code)        { alert('招待コードを入力してください'); return; }
+  if (!name)        { alert('氏名を入力してください'); return; }
+  if (!role)        { alert('役職を選択してください'); return; }
+  if (pw.length < 6){ alert('パスワードは6文字以上にしてください'); return; }
+  if (pw !== pw2)   { alert('パスワードが一致しません'); return; }
 
   const btn = document.querySelector('#form-register .btn-primary');
   btn.disabled = true; btn.textContent = '登録中...';
@@ -696,7 +696,7 @@ async function doRegister() {
 
   if (invErr || !invite) {
     btn.disabled = false; btn.textContent = '登録する';
-    showAuthError('reg-error', '招待コードが無効です');
+    alert('招待コードが無効です: ' + (invErr ? invErr.message : '該当なし'));
     return;
   }
 
@@ -705,7 +705,7 @@ async function doRegister() {
     .select('id').eq('display_name', name).eq('is_registered', true).maybeSingle();
   if (existing) {
     btn.disabled = false; btn.textContent = '登録する';
-    showAuthError('reg-error', 'その氏名はすでに登録されています');
+    alert('その氏名はすでに登録されています');
     return;
   }
 
@@ -718,7 +718,7 @@ async function doRegister() {
 
   if (memErr || !newMember) {
     btn.disabled = false; btn.textContent = '登録する';
-    showAuthError('reg-error', '登録に失敗しました。もう一度お試しください');
+    alert('登録に失敗しました: ' + (memErr ? memErr.message : '不明なエラー'));
     return;
   }
 
