@@ -443,6 +443,16 @@ textarea,input{-webkit-appearance:none;appearance:none}
       </table>
     </div>
     <div class="admin-card">
+      <div class="admin-card-title">チャットログ出力</div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.6;">現在選択中の症例のチャットログをCSVでダウンロードします。</p>
+      <div id="log-case-label" style="font-size:12px;color:var(--text2);font-weight:600;margin-bottom:4px;">症例を選択してください</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="admin-add-btn" style="width:auto;padding:9px 16px;" onclick="downloadChatLog('csv')">CSV でダウンロード</button>
+        <button class="admin-add-btn" style="width:auto;padding:9px 16px;background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2);" onclick="downloadChatLog('txt')">テキスト でダウンロード</button>
+      </div>
+    </div>
+
+    <div class="admin-card">
       <div class="admin-card-title">招待コード管理</div>
       <p style="font-size:12px;color:var(--text3);line-height:1.6;">新規登録時に必要なコードを発行します。1つのコードを複数人で使えます。</p>
       <div style="display:flex;gap:6px;">
@@ -529,8 +539,8 @@ textarea,input{-webkit-appearance:none;appearance:none}
 /* ================================================
    設定（自分のSupabase情報に書き換えてください）
 ================================================ */
-const SUPABASE_URL      = 'https://furhbsojbomwazispcrr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1cmhic29qYm9td2F6aXNwY3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDA2NTIsImV4cCI6MjA4OTU3NjY1Mn0.7JcJjhgRCr7sXu2f2PoST8VJn14BQ7HH5YwkeUfeFi0';
+const SUPABASE_URL      = 'https://xxxxxxxxxxxxxxxxxxxx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.XXXX';
 
 /* ================================================
    初期化（anon key のみ使用 / RLS有効）
@@ -1351,7 +1361,15 @@ function stopRealtime() {
 /* ================================================
    管理者画面
 ================================================ */
-async function goAdmin() { showScreen('admin'); await loadAdminMembers(); await loadInviteCodes(); await loadQuizDashboard(); }
+async function goAdmin() {
+  showScreen('admin');
+  await loadAdminMembers();
+  await loadInviteCodes();
+  await loadQuizDashboard();
+  // ログ出力の症例名を更新
+  const label = document.getElementById('log-case-label');
+  if (label) label.textContent = currentCase ? `症例: ${currentCase.title}` : '症例を選択してください';
+}
 function goChat() { showScreen('chat'); }
 
 async function loadAdminMembers() {
@@ -1659,8 +1677,10 @@ async function closeQuiz(quizId) {
   const { error } = await db.from('quizzes')
     .update({ status: 'closed', closed_at: new Date().toISOString() })
     .eq('id', quizId);
-  if (!error) await loadQuizDashboard();
-  else alert('終了に失敗しました');
+  if (!error) {
+    await loadQuizDashboard();
+    await loadActiveQuiz(); // 自分の画面のバナーも更新
+  } else alert('終了に失敗しました');
 }
 
 async function deleteQuiz(quizId) {
@@ -1682,13 +1702,15 @@ async function loadActiveQuiz() {
   const { data } = await db.from('quizzes')
     .select('*').eq('case_id', currentCase.id).eq('status', 'active').maybeSingle();
   if (data) {
-    // 同じ問題が既に表示中かつ入力中の場合はスキップ
-    if (currentQuizId === data.id) {
-      const answerInput = document.getElementById('quiz-answer-input');
-      const isTyping = answerInput && answerInput.value.trim().length > 0;
-      if (isTyping) return;
+    // 新しい問題に切り替わった場合は必ず再描画
+    if (currentQuizId !== data.id) {
+      showQuizBanner(data);
+      return;
     }
-    showQuizBanner(data);
+    // 同じ問題で入力中の場合はスキップ
+    const answerInput = document.getElementById('quiz-answer-input');
+    const isTyping = answerInput && answerInput.value.trim().length > 0;
+    if (!isTyping) showQuizBanner(data);
   } else {
     hideQuizBanner();
   }
@@ -1780,6 +1802,67 @@ async function submitQuizAnswer() {
   } else {
     if (btn) btn.disabled = false;
     alert('送信に失敗しました');
+  }
+}
+
+async function downloadChatLog(format) {
+  if (!currentCase) { alert('チャット画面で症例を選択してから管理者画面を開いてください'); return; }
+  const { data: messages } = await db.from('messages')
+    .select('*').eq('case_id', currentCase.id).order('created_at');
+  if (!messages || messages.length === 0) { alert('投稿がありません'); return; }
+
+  const parents  = messages.filter(m => !m.parent_id);
+  const children = messages.filter(m =>  m.parent_id);
+  const title    = currentCase.title || '症例';
+  const dateStr  = new Date().toLocaleDateString('ja-JP').replace(/\//g, '-');
+  const NL       = '\n';
+
+  if (format === 'csv') {
+    const BOM    = '\uFEFF';
+    const header = ['投稿日時','氏名','役職','タグ','スライド','匿名','リプライ先','内容'].join(',');
+    const rows   = messages.map(m => {
+      const parent = m.parent_id ? parents.find(p => p.id === m.parent_id) : null;
+      const cols   = [
+        new Date(m.created_at).toLocaleString('ja-JP'),
+        m.is_anonymous ? '匿名' : (m.display_name || ''),
+        m.role || '',
+        m.tag || '',
+        m.slide_no != null ? 'スライド' + m.slide_no : '',
+        m.is_anonymous ? '○' : '',
+        parent ? (parent.is_anonymous ? '匿名' : parent.display_name) + 'へのリプライ' : '',
+        (m.body || '').replace(/"/g, '""')
+      ].map(c => '"' + c + '"');
+      return cols.join(',');
+    });
+    const csv  = BOM + [header].concat(rows).join(NL);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = title + '_チャットログ_' + dateStr + '.csv'; a.click();
+    URL.revokeObjectURL(url);
+  } else {
+    let text = '【' + title + '】チャットログ' + NL;
+    text += '出力日時: ' + new Date().toLocaleString('ja-JP') + NL;
+    text += '========================================' + NL + NL;
+    parents.forEach(msg => {
+      const name  = msg.is_anonymous ? '匿名' : msg.display_name;
+      const tag   = msg.tag ? '[' + msg.tag + ']' : '';
+      const slide = msg.slide_no != null ? '[スライド' + msg.slide_no + ']' : '';
+      const time  = new Date(msg.created_at).toLocaleString('ja-JP');
+      text += time + ' ' + name + '(' + (msg.role || '') + ')' + tag + slide + NL;
+      text += msg.body + NL;
+      children.filter(r => r.parent_id === msg.id).forEach(r => {
+        const rname = r.is_anonymous ? '匿名' : r.display_name;
+        const rtime = new Date(r.created_at).toLocaleString('ja-JP');
+        text += '  ↩ ' + rtime + ' ' + rname + ': ' + r.body + NL;
+      });
+      text += NL;
+    });
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = title + '_チャットログ_' + dateStr + '.txt'; a.click();
+    URL.revokeObjectURL(url);
   }
 }
 
